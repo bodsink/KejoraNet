@@ -729,7 +729,6 @@ export const snmpRoute = (app, client) => {
 
 
                 const walk = await snmpLib.scanOnu(data);
-                console.log(walk)
 
                 if (walk.length == 0) {
                     return createError(404, 'No Onu found')

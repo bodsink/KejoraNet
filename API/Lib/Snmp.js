@@ -361,7 +361,7 @@ export default class libSnmp {
             };
 
             const scanModel = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port}SNMPv2-SMI::enterprises.3902.1082.500.20.2.1.2.1.8${id.int_olt}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.20.2.1.2.1.8${id.int_olt}`);
 
                 const onuName = stdout.split('\n',).filter(Boolean);
 

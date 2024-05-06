@@ -1,0 +1,33 @@
+{
+  "name": "api-mongodb_client",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "nodemon Server.js",
+  "scripts": {
+    "start": "nodemon Server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "argon2": "^0.40.1",
+    "axios": "^1.6.8",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "cron": "^3.1.7",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.2.0",
+    "http-errors": "^2.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "method-override": "^3.0.0",
+    "moment-timezone": "^0.5.45",
+    "mongodb": "^6.5.0",
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.3",
+    "telnet-client": "^2.2.0",
+    "uuid": "^9.0.1",
+    "xlsx": "^0.18.5"
+  }
+}

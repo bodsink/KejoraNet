@@ -28,14 +28,14 @@ client.connect().then(() => {
 
 
 
-const limiter = rateLimit({
-	windowMs: 60 * 1000, // 1 minutes
-	limit: 1000, // Limit each IP to 100 requests per `window` (here, per 1 minutes).
-	standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
-	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
-    message: "You have exceeded requests rate limit.",
-	// store: ... , // Redis, Memcached, etc. See below.
-})
+// const limiter = rateLimit({
+// 	windowMs: 60 * 1000, // 1 minutes
+// 	limit: 1000, // Limit each IP to 100 requests per `window` (here, per 1 minutes).
+// 	standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+// 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+//     message: "You have exceeded requests rate limit.",
+// 	// store: ... , // Redis, Memcached, etc. See below.
+// })
 
 
 
@@ -43,7 +43,7 @@ const limiter = rateLimit({
 const app = express();
 const server = http.createServer(app);
 
-app.use(limiter);
+//app.use(limiter);
 
 app.use(methodOverride());
 

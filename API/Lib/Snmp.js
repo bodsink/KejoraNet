@@ -559,8 +559,6 @@ export default class libSnmp {
             const ifIndex = async () => {
                 const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.2.1.2.2.1.1${id.device}`);
 
-                console.log(stdout)
-
                 const ifIndex = stdout.split('\n').filter(Boolean);
 
                 let index = [];
@@ -809,22 +807,22 @@ export default class libSnmp {
             });
 
           
-            const arrayIndex = IndexIf.map((item, index) => {
-                return {
-                    ...item,
-                    ifName: item.ifName[0].ifname,
-                    ifDesc: item.ifDesc[0].ifDesc,
-                    ifAlias: item.ifName[0].alias,
-                    index: item.ifName[0].index,
-                    ifType: item.ifType[0].type,
-                    ifMtu: item.ifMtu[0].ifMtu,
-                    ifSpeed: item.ifSpeed[0].ifSpeed,
-                    ifAdminStatus: item.ifAdminStatus[0].ifAdminStatus,
-                    ifOperStatus: item.ifOperStatus[0].ifOperStatus,
-                }
-            });
+            // const arrayIndex = IndexIf.map((item, index) => {
+            //     return {
+            //         ...item,
+            //         ifName: item.ifName[0].ifname,
+            //         ifDesc: item.ifDesc[0].ifDesc,
+            //         ifAlias: item.ifName[0].alias,
+            //         index: item.ifName[0].index,
+            //         ifType: item.ifType[0].type,
+            //         ifMtu: item.ifMtu[0].ifMtu,
+            //         ifSpeed: item.ifSpeed[0].ifSpeed,
+            //         ifAdminStatus: item.ifAdminStatus[0].ifAdminStatus,
+            //         ifOperStatus: item.ifOperStatus[0].ifOperStatus,
+            //     }
+            // });
 
-           return arrayIndex;
+           return IndexIf;
         }
         catch (error) {
             throw error;

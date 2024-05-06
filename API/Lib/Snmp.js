@@ -835,7 +835,7 @@ export default class libSnmp {
             }
 
             const zxAnOpticalVendorPn = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.30.40.2.4.1.11${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.30.40.2.4.1.11${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -870,7 +870,7 @@ export default class libSnmp {
 
 
             const zxAnOpticalVendorName = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.30.40.2.4.1.12${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.30.40.2.4.1.12${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -904,7 +904,7 @@ export default class libSnmp {
 
 
             const zxAnOpticalVendorSn = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.30.40.2.4.1.13${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.30.40.2.4.1.13${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -938,7 +938,7 @@ export default class libSnmp {
 
 
             const zxAnOpticalModuleType = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.30.40.2.4.1.15${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.30.40.2.4.1.15${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -972,7 +972,7 @@ export default class libSnmp {
 
 
             const zxAnOpticalFiberInterfaceType = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.30.40.2.4.1.16${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.30.40.2.4.1.16${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -1006,7 +1006,7 @@ export default class libSnmp {
 
 
             const zxAnOpticalTransDistanceSmLongR = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.30.40.2.4.1.40${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.30.40.2.4.1.40${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -1041,7 +1041,7 @@ export default class libSnmp {
 
 
             const zxAnOpticalIfRxPwrCurrValue = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.30.40.2.4.1.2${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.30.40.2.4.1.2${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -1078,7 +1078,7 @@ export default class libSnmp {
 
 
             const zxAnOpticalIfTxPwrCurrValue = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.30.40.2.4.1.3${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.30.40.2.4.1.3${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -1115,7 +1115,7 @@ export default class libSnmp {
 
             const zxAnOpticalBiasCurrent = async () => {
 
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.30.40.2.4.1.5${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .SNMPv2-SMI::enterprises.3902.1082.30.40.2.4.1.5${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -1152,7 +1152,7 @@ export default class libSnmp {
 
             const zxAnOpticalSupplyVoltage = async () => {
 
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.30.40.2.4.1.6${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.30.40.2.4.1.6${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -1190,7 +1190,7 @@ export default class libSnmp {
 
             const zxAnOpticalWavelength = async () => {
 
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.30.40.2.4.1.7${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.30.40.2.4.1.7${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -1226,7 +1226,7 @@ export default class libSnmp {
             };//The optical module wavelength.
 
             const zxAnOpticalTemperature = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.30.40.2.4.1.8${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.30.40.2.4.1.8${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);

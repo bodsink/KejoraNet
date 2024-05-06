@@ -573,6 +573,8 @@ export default class libSnmp {
                     });
 
                 }
+
+                console.log(index)
                
                 return index;
             }
@@ -807,22 +809,22 @@ export default class libSnmp {
             });
 
           
-            // const arrayIndex = IndexIf.map((item, index) => {
-            //     return {
-            //         ...item,
-            //         ifName: item.ifName[0].ifname,
-            //         ifDesc: item.ifDesc[0].ifDesc,
-            //         ifAlias: item.ifName[0].alias,
-            //         index: item.ifName[0].index,
-            //         ifType: item.ifType[0].type,
-            //         ifMtu: item.ifMtu[0].ifMtu,
-            //         ifSpeed: item.ifSpeed[0].ifSpeed,
-            //         ifAdminStatus: item.ifAdminStatus[0].ifAdminStatus,
-            //         ifOperStatus: item.ifOperStatus[0].ifOperStatus,
-            //     }
-            // });
+            const arrayIndex = IndexIf.map((item, index) => {
+                return {
+                    ...item,
+                    ifName: item.ifName[0].ifname,
+                    ifDesc: item.ifDesc[0].ifDesc,
+                    ifAlias: item.ifName[0].alias,
+                    index: item.ifName[0].index,
+                    ifType: item.ifType[0].type,
+                    ifMtu: item.ifMtu[0].ifMtu,
+                    ifSpeed: item.ifSpeed[0].ifSpeed,
+                    ifAdminStatus: item.ifAdminStatus[0].ifAdminStatus,
+                    ifOperStatus: item.ifOperStatus[0].ifOperStatus,
+                }
+            });
 
-           return IndexIf;
+           return arrayIndex;
         }
         catch (error) {
             throw error;

@@ -1298,7 +1298,7 @@ export default class libSnmp {
             }
 
             const zxAnCardConfMainType = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.10.1.2.4.1.2${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.10.1.2.4.1.2.1.1${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -1322,7 +1322,7 @@ export default class libSnmp {
 
 
             const zxAnCardActualType = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.10.1.2.4.1.4${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.10.1.2.4.1.4.1.1${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -1346,7 +1346,7 @@ export default class libSnmp {
 
 
             const zxAnSubcardPortNums = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.10.1.2.4.1.7${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.10.1.2.4.1.7.1.1${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -1370,7 +1370,7 @@ export default class libSnmp {
             };//The subcard port numbers.
 
             const zxAnCardTemp = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.4.1.3902.1082.10.10.2.1.6.1.2${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.10.10.2.1.6.1.2.1.1${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -1399,7 +1399,7 @@ export default class libSnmp {
             };//The card temperature.
 
             const zxAnCardPowerConsumption = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.4.1.3902.1082.10.10.2.1.6.1.3${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.10.10.2.1.6.1.3.1.1${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -1428,7 +1428,7 @@ export default class libSnmp {
             }//The card power consumption.
 
             const zxAnCardOperStatus = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.10.1.2.4.1.5${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.10.1.2.4.1.5.1.1${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);

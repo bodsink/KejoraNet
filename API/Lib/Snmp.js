@@ -805,6 +805,8 @@ export default class libSnmp {
                 }
             });
 
+            console.log(IndexIf)
+
             const arrayIndex = IndexIf.map((item, index) => {
                 return {
                     ...item,

@@ -1115,7 +1115,7 @@ export default class libSnmp {
 
             const zxAnOpticalBiasCurrent = async () => {
 
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .SNMPv2-SMI::enterprises.3902.1082.30.40.2.4.1.5${id.interfaces}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.30.40.2.4.1.5${id.interfaces}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);

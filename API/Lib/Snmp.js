@@ -557,7 +557,7 @@ export default class libSnmp {
 
 
             const ifIndex = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.2.1.2.2.1.1${id.device}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} IF-MIB::ifIndex${id.device}`);
 
                 const ifIndex = stdout.split('\n').filter(Boolean);
 

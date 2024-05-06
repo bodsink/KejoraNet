@@ -1,0 +1,2192 @@
+ZTE-AN-PON-REMOTE-ONU-MIB DEFINITIONS ::= BEGIN
+    IMPORTS 
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter32,
+        NOTIFICATION-TYPE, TimeTicks, IpAddress, 
+        Integer32                                   FROM SNMPv2-SMI
+        OBJECT-GROUP, MODULE-COMPLIANCE             FROM SNMPv2-CONF
+        DisplayString, DateAndTime, MacAddress, TruthValue, RowStatus, 
+        TEXTUAL-CONVENTION                          FROM SNMPv2-TC
+        InetAddress, InetAddressType                FROM INET-ADDRESS-MIB
+        ifIndex                                     FROM IF-MIB
+        zxAnPon                                     FROM ZTE-AN-SMI
+        ZxAnPonRmOnuIfIndex, ZxAnPonRmOnuUniIndex   FROM ZTE-AN-PON-TC-MIB
+        zxAnPonOnuIndex                             FROM ZTE-AN-PON-BASE-MIB;
+       
+zxAnPonRemoteOnuMib MODULE-IDENTITY
+    LAST-UPDATED    "201202270000Z"
+    ORGANIZATION    "ZTE Corporation"
+    CONTACT-INFO    "Guo HongJian      ZTE Corporation
+                    Mail: guo.hongjian@zte.com.cn
+                    Tel : +86-21-68897417"
+    DESCRIPTION     
+        "The MIB module for the management of PON remote ONU service."
+        
+    REVISION        "201202270000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { zxAnPon 3 }
+
+--------------------------------------------------------------------------------
+-- Following management objects are defined.
+
+-- zxAnPonRmOnuObjects
+        -- zxAnPonRmOnuIfProtoConfTable(not support this  table)
+    -- zxAnPonRmOnuVoipObjects   
+        -- zxAnPonRmPotsCallDataRecordTable(not support this table)
+    -- zxAnPonRmOnuCliOverSnmpObjects    
+        -- zxAnPonRmOnuRetrieveCmdTable
+    -- zxAnPonRmOnuCfmObjects
+        -- zxAnPonRmOnuCfmMdTable
+        -- zxAnPonRmOnuCfmMaTable
+        -- zxAnPonRmOnuCfmMepTable
+    -- zxAnPonRmOnuOamObjects
+        -- zxAnPonRmOnuPppoeTestTable
+        -- zxAnPonRmOnuIpoeTestTable
+        -- zxAnPonRmOnuVoipCalleeTestTable
+        -- zxAnPonRmOnuVoipCallerTestTable
+        -- zxAnPonRmOnuOTransceiversTable        
+--------------------------------------------------------------------------------   
+zxAnPonRmOnuObjects         OBJECT IDENTIFIER ::= { zxAnPonRemoteOnuMib 2 }
+zxAnPonRmOnuProtocolObjects OBJECT IDENTIFIER ::= { zxAnPonRmOnuObjects 1 }
+zxAnPonRmOnuVoipObjects     OBJECT IDENTIFIER ::= { zxAnPonRmOnuObjects 2 }
+zxAnPonRmOnuCliOverSnmpObjects      OBJECT IDENTIFIER ::=
+                                                    { zxAnPonRmOnuObjects 5 }
+zxAnPonRmOnuCfmObjects      OBJECT IDENTIFIER ::= { zxAnPonRmOnuObjects 8 }
+
+zxAnPonRmOnuOamObjects      OBJECT IDENTIFIER ::= { zxAnPonRmOnuObjects 9 }
+
+--------------------------------------------------------------------------------  
+-- ONU port protocol configuration Table                                                    
+-- zxAnPonRmOnuIfProtoConfTable                                                        
+--------------------------------------------------------------------------------          
+    zxAnPonRmOnuIfProtoConfTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF ZxAnPonRmOnuIfProtoConfEntry
+        MAX-ACCESS   not-accessible 
+        STATUS       current 
+        DESCRIPTION 
+            "This table includes protocol configuration 
+            information of ONU's Ethernet UNI port."
+          ::= { zxAnPonRmOnuProtocolObjects 5 } 
+          
+    zxAnPonRmOnuIfProtoConfEntry OBJECT-TYPE 
+        SYNTAX      ZxAnPonRmOnuIfProtoConfEntry
+        MAX-ACCESS  not-accessible 
+        STATUS      current 
+        DESCRIPTION 
+            "An entry in zxAnPonRmOnuIfProtoConfTable." 
+        INDEX       { ifIndex, zxAnPonOnuIndex, zxAnPonRmOnuIfIndex}
+        ::= { zxAnPonRmOnuIfProtoConfTable 1 }
+        
+    ZxAnPonRmOnuIfProtoConfEntry  ::=  SEQUENCE {
+        zxAnPonRmOnuIfIndex                   ZxAnPonRmOnuIfIndex,
+        zxAnPonRmOnuIfProtoPktsLimitPrf       DisplayString,
+        zxAnPonRmOnuIfProtoEnablePrf          DisplayString
+        }          
+
+    zxAnPonRmOnuIfIndex OBJECT-TYPE
+        SYNTAX       ZxAnPonRmOnuIfIndex
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "This attribute specifies the index of ONU's interface."
+        ::= { zxAnPonRmOnuIfProtoConfEntry 1 } 
+
+    zxAnPonRmOnuIfProtoPktsLimitPrf    OBJECT-TYPE
+        SYNTAX      DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Refers to 'zxAnPonRmProtoPktsLimitPrfName'."
+        ::= { zxAnPonRmOnuIfProtoConfEntry 2 }
+        
+    zxAnPonRmOnuIfProtoEnablePrf    OBJECT-TYPE
+        SYNTAX      DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Refers to 'zxAnPonRmProtoEnablePrfName'."
+        ::= { zxAnPonRmOnuIfProtoConfEntry 3 } 
+              
+--------------------------------------------------------------------------------  
+-- PON ONU POTS calling data record table                                                 
+-- zxAnPonRmPotsCallDataRecordTable                                                      
+--------------------------------------------------------------------------------  
+    zxAnPonRmPotsCallDataRecordTable    OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ZxAnPonRmPotsCallDataRecordEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "PON ONU POTS calling data record table."
+        ::= { zxAnPonRmOnuVoipObjects 2 }
+
+    zxAnPonRmPotsCallDataRecordEntry OBJECT-TYPE
+        SYNTAX      ZxAnPonRmPotsCallDataRecordEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in zxAnPonRmPotsCallDataRecordTable."
+        INDEX   { ifIndex, zxAnPonOnuIndex,
+         zxAnPonRmOnuUniIndex, zxAnPonRmPotsCdrIndex }
+        ::= { zxAnPonRmPotsCallDataRecordTable 1 }
+        
+    ZxAnPonRmPotsCallDataRecordEntry ::=
+        SEQUENCE {
+            zxAnPonRmOnuUniIndex            ZxAnPonRmOnuUniIndex,
+            zxAnPonRmPotsCdrIndex           Integer32,
+            zxAnPonRmPotsCdrTotalNum        Integer32,
+            zxAnPonRmPotsCdrSequenceNum     Integer32,
+            zxAnPonRmPotsCdrTime            DateAndTime,
+            zxAnPonRmPotsCdrDuration        Integer32,
+            zxAnPonRmPotsCdrCalleeNumber    DisplayString,
+            zxAnPonRmPotsCdrCallerNumber    DisplayString,
+            zxAnPonRmPotsCdrTxRtpPkts       Integer32,
+            zxAnPonRmPotsCdrRxRtpPkts       Integer32,
+            zxAnPonRmPotsCdrLostRtpPkts     Integer32,
+            zxAnPonRmPotsCdrDiscardRtpPkts  Integer32,
+            zxAnPonRmPotsCdrBufOverCount    Integer32,
+            zxAnPonRmPotsCdrBufEmptyCount   Integer32,
+            zxAnPonRmPotsCdrRxAvgJitter     Integer32,
+            zxAnPonRmPotsCdrFarEndRtcp      INTEGER,
+            zxAnPonRmPotsCdrRxPeakJitter    Integer32,
+            zxAnPonRmPotsCdrRxAvgJtrBufDep  Integer32,
+            zxAnPonRmPotsCdrFarEndRtcpXr    INTEGER,
+            zxAnPonRmPotsCdrPeakRtDelay     Integer32,
+            zxAnPonRmPotsCdrAvgRtDelay      Integer32,
+            zxAnPonRmPotsCdrAvgMos          Integer32
+        }
+                
+    zxAnPonRmOnuUniIndex OBJECT-TYPE
+        SYNTAX      ZxAnPonRmOnuUniIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This attribute indicates the index of UNI in ONU."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 1}    
+            
+    zxAnPonRmPotsCdrIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "VoIP calling record index."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 2 }
+
+    zxAnPonRmPotsCdrTotalNum OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of the call records."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 3 }            
+
+    zxAnPonRmPotsCdrSequenceNum OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Sequence number of call record."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 4 }  
+
+    zxAnPonRmPotsCdrTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The time of one call,
+             format is yyyy-mm-dd,HH:MM:SS. For example,2010-12-30,13:06:30."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 5 }  
+
+    zxAnPonRmPotsCdrDuration OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The duration of one call."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 6 }  
+        
+    zxAnPonRmPotsCdrCalleeNumber OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Callee number."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 7 }  
+        
+    zxAnPonRmPotsCdrCallerNumber OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Caller number."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 8 }  
+        
+    zxAnPonRmPotsCdrTxRtpPkts OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of 
+             RTP packets transmitted during the call."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 9 }  
+        
+    zxAnPonRmPotsCdrRxRtpPkts OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The total number of RTP packets received during the call."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 10 } 
+         
+    zxAnPonRmPotsCdrLostRtpPkts OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of 
+             RTP packets lost during the call."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 11 }  
+        
+    zxAnPonRmPotsCdrDiscardRtpPkts OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of 
+             RTP packets discarded due to error."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 12 }  
+        
+    zxAnPonRmPotsCdrBufOverCount OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Buffer overflow count."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 13 }  
+        
+    zxAnPonRmPotsCdrBufEmptyCount OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Buffer empty count."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 14 }  
+        
+    zxAnPonRmPotsCdrRxAvgJitter OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Milliseconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The average jitter for received packets."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 15 }  
+        
+    zxAnPonRmPotsCdrFarEndRtcp OBJECT-TYPE
+        SYNTAX      INTEGER{
+                    participated(1),
+                    notParticipated(2)
+                    } 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Whether or not the 
+             far end participated in RTCP."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 16 }  
+        
+    zxAnPonRmPotsCdrRxPeakJitter OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Milliseconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak jitter for received packets."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 17 }  
+        
+    zxAnPonRmPotsCdrRxAvgJtrBufDep OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Milliseconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The average jitter buffer depth for received packets."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 18 }  
+        
+    zxAnPonRmPotsCdrFarEndRtcpXr OBJECT-TYPE
+        SYNTAX      INTEGER{
+                    participated(1),
+                    notParticipated(2)
+                    } 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Whether or not the
+             far end participated in RTCP-XR."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 19 }  
+        
+    zxAnPonRmPotsCdrPeakRtDelay OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Milliseconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak round-trip delay for a call."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 20 }  
+        
+    zxAnPonRmPotsCdrAvgRtDelay OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Milliseconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The average round-trip delay for the call."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 21 }  
+        
+    zxAnPonRmPotsCdrAvgMos OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The average mean opinion score."
+        ::= { zxAnPonRmPotsCallDataRecordEntry 22 }   
+    
+--------------------------------------------------------------------------------
+--5 zxAnPonRmOnuCliOverSnmpObjects begin
+--------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+--5.3 zxAnPonRmOnuRetrieveCmdTable
+------------------------------------------------------------------------------
+    zxAnPonRmOnuRetrieveCmdTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnPonRmOnuRetrieveCmdEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "EMS can send zxAnPonRmOnuRetrieveCmd to retrieve ONU monitoring
+             metrics which are not defined by ME of OMCI or OAM.
+             Otherwise, EMS can retrieve error messages of excution of
+             zxAnPonRmOnuConfCmd  in ONU.
+
+            The action is divided into two steps.
+            Step one:
+                EMS sends zxAnPonRmOnuRetrieveCmdSessionId and
+                zxAnPonRmOnuRetrieveCmd to OLT.
+                The format of zxAnPonRmOnuRetrieveCmd is:
+                'command head::[parameter 1]=P1,[parameter 2]=P2,
+                 ...[parameter n]=Pn;'
+                the command head represents a configuration function 
+                which is defined by EMS and ONU.
+                parameters are followed by '::' and separated by ',',
+                the end of the command must be ';'.
+                Example:
+                 GET_WAN_CONF::WANID=1;                 
+            Step two:  
+                The result is saved in zxAnPonRmOnuRetrieveCmdReply.
+                EMS can retrieve result by zxAnPonRmOnuRetrieveCmdSessionId.
+                The format of zxAnPonRmOnuRetrieveCmdReply is:
+                'command head::[parameter 1]=P1,[parameter 2]=P2,
+                 ...[parameter n]=Pn;'
+                the command head represents a configuration function 
+                which is defined by EMS and ONU.
+                parameters are followed by '::' and separated by ',',
+                the end of the command must be ';'.
+                Example:
+                 GET_WAN_CONF_RESULT::WANID=1,HOST=1,MODE=1,PPPUser=test,
+                   PPPPassword=test;  "
+        ::=  { zxAnPonRmOnuCliOverSnmpObjects  3 }
+
+    zxAnPonRmOnuRetrieveCmdEntry   OBJECT-TYPE
+        SYNTAX      ZxAnPonRmOnuRetrieveCmdEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in zxAnPonRmOnuRetrieveCmdTable."
+        INDEX { ifIndex,zxAnPonOnuIndex,
+                zxAnPonRmOnuRetrieveCmdSessionId }
+        ::=  { zxAnPonRmOnuRetrieveCmdTable 1 }
+
+    ZxAnPonRmOnuRetrieveCmdEntry  ::=  SEQUENCE {
+        zxAnPonRmOnuRetrieveCmdSessionId    Integer32,
+        zxAnPonRmOnuRetrieveCmd             OCTET STRING,
+        zxAnPonRmOnuRetrieveCmdReply        OCTET STRING
+        }
+
+
+    zxAnPonRmOnuRetrieveCmdSessionId OBJECT-TYPE
+        SYNTAX      Integer32(0..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This attribute identifies the session ID.
+             The session ID is generated by EMS and is unique in EMS.
+             Session ID can ensure that reply result does not conflicting."
+        ::= { zxAnPonRmOnuRetrieveCmdEntry 1 }
+
+    zxAnPonRmOnuRetrieveCmd    OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..1024))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This attribute identifies commands
+            which declared the information which EMS needs.
+            "
+        ::= { zxAnPonRmOnuRetrieveCmdEntry 2 }
+
+    zxAnPonRmOnuRetrieveCmdReply    OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..1024))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This attribute identifies the reply result.
+            "
+        ::= { zxAnPonRmOnuRetrieveCmdEntry 3 }
+
+-------------------------------------------------------------------------------
+--8 zxAnPonRmOnuCfmObjects
+-------------------------------------------------------------------------------
+--8.2 zxAnPonRmOnuCfmMdTable
+-------------------------------------------------------------------------------
+    zxAnPonRmOnuCfmMdTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ZxAnPonRmOnuCfmMdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The Maintenance Domain table. Each row in the table
+             represents a different Maintenance Domain.
+             A Maintenance Domain is described in 802.1ag (3.22) as the
+             network or the part of the network for which faults in
+             connectivity are to be managed. The boundary of a Maintenance
+             Domain is defined by a set of DSAPs, each of which can become
+             a point of connectivity to a service instance.
+             This table only used by GPON service.
+            "
+        REFERENCE
+        "ITU-T G988 clause 9.3.19"
+        ::= { zxAnPonRmOnuCfmObjects 2 }
+
+    zxAnPonRmOnuCfmMdEntry OBJECT-TYPE
+        SYNTAX ZxAnPonRmOnuCfmMdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The Maintenance Domain table entry.
+            The index 'zxAnPonOnuIndex' represents the normal ONU index.
+            "
+       INDEX {ifIndex, zxAnPonOnuIndex, zxAnPonRmOnuCfmMdId }
+       ::= { zxAnPonRmOnuCfmMdTable 1 }
+
+    ZxAnPonRmOnuCfmMdEntry ::= SEQUENCE {
+            zxAnPonRmOnuCfmMdId                 Integer32,
+            zxAnPonRmOnuCfmMdFormat             INTEGER,
+            zxAnPonRmOnuCfmMdName               OCTET STRING,
+            zxAnPonRmOnuCfmMdMdLevel            Integer32,
+            zxAnPonRmOnuCfmMdMhfCreation        INTEGER,
+            zxAnPonRmOnuCfmSendIdPermission     INTEGER,
+            zxAnPonRmOnuCfmMdRowStatus          RowStatus
+            }
+
+    zxAnPonRmOnuCfmMdId OBJECT-TYPE
+        SYNTAX Integer32 (1..16)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+             "The index to the Maintenance Domain table.
+              Referential integrity is required, i.e., the index needs to be
+              persistent upon a reboot or restart of a device. The index
+              can never be reused for other Maintenance Domain. The index
+              value should keep increasing up to the time that they wrap
+              around. This is to facilitate access control based on OID.
+            "
+        REFERENCE
+        "ITU-T G988 clause 9.3.19"
+       ::= { zxAnPonRmOnuCfmMdEntry 1 }
+
+    zxAnPonRmOnuCfmMdFormat OBJECT-TYPE
+        SYNTAX INTEGER {
+            none              (1),
+            dnsLikeName       (2),
+            macAddressAndUint (3),
+            charString        (4),
+            iccBased          (5)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The type (and thereby format) of the Maintenance Domain Name.
+             A value that represents a type (and thereby the format)
+             of a zxAnPonRmOnuCfmMdName.  The value can be one of
+             the following:
+             none(1)           No format specified, usually because
+                               there is not (yet) a Maintenance
+                               Domain Name. In this case, a zero
+                               length OCTET STRING for the Domain
+                               Name field is acceptable.
+             dnsLikeName(2)    Domain Name like string, globally unique
+                               text string derived from a DNS name.
+             macAddrAndUint(3) MAC address + 2-octet (unsigned) integer.
+             charString(4)     RFC2579 DisplayString, except that the
+                               character codes 0-31 (decimal) are not
+                               used.
+             iccBased(5)       ITU carrier code followed by locally
+                               assigned UMC code, 13 bytes with trailing
+                               nulls as needed.
+             "
+        REFERENCE
+         "802.1ag clause 21.6.5.1; ITU-T Y.1731; ITU-T G988 9.3.19"
+        DEFVAL { charString }
+        ::= { zxAnPonRmOnuCfmMdEntry 2 }
+
+    zxAnPonRmOnuCfmMdName OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(0..45))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The Maintenance Domain name. The type/format of this object
+            is determined by the value of the zxAnPonRmOnuCfmMdFormat object.
+            Each Maintenance Domain has unique name amongst all those
+            used or available to a service provider or operator. It
+            facilitates easy identification of administrative
+            responsibility for each Maintenance Domain.
+            Clause 3.24 defines a Maintenance Domain name as the
+            identifier, unique over the domain for which CFM is to
+            protect against accidental concatenation of Service
+            Instances, of a particular Maintenance Domain.
+            "
+        REFERENCE
+         "802.1ag clause 21.6.5.1; ITU-T Y.1731; ITU-T G988 9.3.19"
+        ::= { zxAnPonRmOnuCfmMdEntry 3 }
+
+    zxAnPonRmOnuCfmMdMdLevel OBJECT-TYPE
+        SYNTAX Integer32 (0..7)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+             "The Maintenance Domain Level.
+             Integer identifying the Maintenance Domain Level (MD Level).
+             Higher numbers correspond to higher Maintenance Domains,
+             those with the greatest physical reach, with the highest
+             values for customer's CFM packets. Lower numbers correspond
+             to lower Maintenance Domains, those with more limited
+             physical reach, with the lowest values for CFM PDUs
+             protecting single bridges or physical links."
+        REFERENCE
+         "802.1ag clause 21.6.5.1; ITU-T Y.1731; ITU-T G988 9.3.19"
+        DEFVAL { 0 }
+        ::= { zxAnPonRmOnuCfmMdEntry 4 }
+
+    zxAnPonRmOnuCfmMdMhfCreation OBJECT-TYPE
+        SYNTAX INTEGER {
+            defMHFnone     (1),
+            defMHFdefault  (2),
+            defMHFexplicit (3)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Indicates if the Management Entity can create MHFs.
+            Enumerated value indicating whether the management entity can
+            create MHFs (MIP Half Function) for this Maintenance Domain.
+
+            The valid values are:
+
+            defMHFnone(1)      No MHFs can be created for this VID.
+            defMHFdefault(2)   MHFs can be created on this VID on any
+                               Bridge port through which this VID can
+                               pass.
+            defMHFexplicit(3)  MHFs can be created for this VID only on
+                               Bridge ports through which this VID can
+                               pass, and only if a MEP is created at some
+                               lower MD Level.
+            "
+        REFERENCE
+            "802.1ag clause 12.14.5.1.3:c"
+        DEFVAL { defMHFnone }
+        ::= { zxAnPonRmOnuCfmMdEntry 5 }
+
+    zxAnPonRmOnuCfmSendIdPermission OBJECT-TYPE
+        SYNTAX INTEGER {
+             sendIdNone          (1),
+             sendIdChassis       (2),
+             sendIdManage        (3),
+             sendIdChassisManage (4)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+             "Enumerated value indicating what, if anything, is to be
+             included in the Sender ID TLV (21.5.3) transmitted by MPs
+             configured in this Maintenance Domain. Since, in this
+             variable, there is no encompassing Maintenance Domain, the
+             value sendIdDefer takes the meaning of sendIdChassisManage.
+             The valid values are:
+
+             sendIdNone(1)      The Sender ID TLV is not to be sent.
+             sendIdChassis(2)   The Chassis ID Length, Chassis ID
+                                Subtype, and Chassis ID fields of  the
+                                Sender ID TLV are to be sent.
+             sendIdManage(3)    The Management Address Length and
+                                Management Address of the Sender ID TLV
+                                are to be sent.
+             sendIdChassisManage(4) The Chassis ID Length, Chassis ID
+                                Subtype, Chassis ID, Management Address
+                                Length and Management Address fields are
+                                all to be sent.
+             "
+        REFERENCE
+             "802.1ag clause 12.14.5.1.3:d"
+        DEFVAL { sendIdNone }
+        ::= { zxAnPonRmOnuCfmMdEntry 6 }
+
+    zxAnPonRmOnuCfmMdRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+             "The status of the row.
+             The writable columns in a row can not be changed if the row
+             is active. All columns must have a valid value before a row
+             can be activated.
+             "
+        ::= { zxAnPonRmOnuCfmMdEntry 50 }
+
+-------------------------------------------------------------------------------
+--8.3 zxAnPonRmOnuCfmMaTable
+-------------------------------------------------------------------------------
+
+    zxAnPonRmOnuCfmMaTable    OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ZxAnPonRmOnuCfmMaEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This managed entity models an IEEE 802.1 service defined
+             on a bridge port. A maintenance association (MA) is
+             a set of endpoints on opposite sides of a network,
+             all existing at a defined maintenance level.
+             This table only used by GPON service."
+        REFERENCE   "G.984.4 9.3.20 Dot1ag maintenance association"
+        ::= { zxAnPonRmOnuCfmObjects 3 }
+
+    zxAnPonRmOnuCfmMaEntry OBJECT-TYPE
+        SYNTAX      ZxAnPonRmOnuCfmMaEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "It is entry in the zxAnPonRmOnuCfmMaTable."
+        INDEX   {ifIndex, zxAnPonOnuIndex, zxAnPonRmOnuCfmMdId, 
+                 zxAnPonOnuCfmMaId }
+        ::= { zxAnPonRmOnuCfmMaTable 1 }
+
+    ZxAnPonRmOnuCfmMaEntry ::=
+        SEQUENCE {
+            zxAnPonOnuCfmMaId                  Integer32,
+            zxAnPonOnuCfmMaNameFormat          INTEGER,
+            zxAnPonOnuCfmMaName                OCTET STRING,
+            zxAnPonOnuCfmMaCcmInterval         INTEGER,
+            zxAnPonOnuCfmMaVlans               DisplayString,
+            zxAnPonOnuCfmMaMhfCreation         INTEGER,
+            zxAnPonOnuCfmMaIdPermission        INTEGER,
+            zxAnPonOnuCfmMaRowStatus           RowStatus
+        }
+
+    zxAnPonOnuCfmMaId OBJECT-TYPE
+        SYNTAX      Integer32 (1..16)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This attribute uniquely identifies an instance of MA."
+        ::= { zxAnPonRmOnuCfmMaEntry 1 }
+
+    zxAnPonOnuCfmMaNameFormat OBJECT-TYPE
+        SYNTAX      INTEGER {
+            primaryVid        (1),
+            charString        (2),
+            unsignedInt16     (3),
+            rfc2865VpnId      (4)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "A value that represents a type (and thereby the format)
+        of a zxAnPonOnuCfmMaName.  The value can be one of
+        the following:
+
+        primaryVid(1)     Primary VLAN ID.
+                          12 bits represented in a 2-octet integer:
+                          - 4 least significant bits of the first
+                            byte contains the 4 most significant
+                            bits of the 12 bits primary VID
+                          - second byte contains the 8 least
+                            significant bits of the primary VID
+
+                                 0 1 2 3 4 5 6 7 8
+                                 +-+-+-+-+-+-+-+-+
+                                 |0 0 0 0| (MSB) |
+                                 +-+-+-+-+-+-+-+-+
+                                 |  VID   LSB    |
+                                 +-+-+-+-+-+-+-+-+
+
+        charString(2)     RFC2579 DisplayString, except that the
+                          character codes 0-31 (decimal) are not
+                          used. (1..45) octets
+        unsignedInt16 (3) 2-octet integer/big endian
+        rfc2865VpnId(4)   RFC 2685 VPN ID
+                          3 octet VPN authority Organizationally
+                          Unique Identifier followed by 4 octet VPN
+                          index identifying VPN according to the OUI:
+
+                                 0 1 2 3 4 5 6 7 8
+                                 +-+-+-+-+-+-+-+-+
+                                 | VPN OUI (MSB) |
+                                 +-+-+-+-+-+-+-+-+
+                                 |   VPN OUI     |
+                                 +-+-+-+-+-+-+-+-+
+                                 | VPN OUI (LSB) |
+                                 +-+-+-+-+-+-+-+-+
+                                 |VPN Index (MSB)|
+                                 +-+-+-+-+-+-+-+-+
+                                 |  VPN Index    |
+                                 +-+-+-+-+-+-+-+-+
+                                 |  VPN Index    |
+                                 +-+-+-+-+-+-+-+-+
+                                 |VPN Index (LSB)|
+                                 +-+-+-+-+-+-+-+-+
+
+        To support future extensions, the zxAnPonOnuCfmMaFormat
+        textual convention SHOULD NOT be sub-typed in object type
+        definitions.  It MAY be sub-typed in compliance statements in
+        order to require only a subset of these address types for a
+        compliant implementation.
+
+        Implementations MUST ensure that zxAnPonOnuCfmMaFormat
+        objects and any dependent objects (e.g.,
+        zxAnPonOnuCfmMaName objects) are consistent.  An
+        inconsistentValue error MUST be generated if an attempt to
+        change an zxAnPonOnuCfmMaFormat object would, for
+        example, lead to an undefined zxAnPonOnuCfmMaName value.
+        In particular,
+        zxAnPonOnuCfmMaFormat/zxAnPonOnuCfmMaName pairs
+        MUST be changed together if the nameType changes.
+
+        The Maintenance Domain name and Maintenance Association name,
+        when put together into the CCM PDU, MUST total 48 octets or
+        less.  If the zxAnPonRmOnuCfmMdFormat object contains
+        none(1), then the zxAnPonOnuCfmMaName object MUST be
+        45 octets or less in length.  Otherwise, the length of
+        the zxAnPonRmOnuCfmMdName object plus the length of the
+        zxAnPonOnuCfmMaName object, added together, MUST total
+        less than or equal to 44 octets."
+        DEFVAL { charString }
+        ::= { zxAnPonRmOnuCfmMaEntry 2 }
+
+    zxAnPonOnuCfmMaName OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..45))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Denotes a generic Maintenance Association Name. It is the
+             part of the Maintenance Association Identifier which is
+             unique within the Maintenance Domain Name and is appended
+             to the Maintenance Domain Name to form the Maintenance
+             Association Identifier (MAID).
+
+             The value is always interpreted within
+             the context of a zxAnPonOnuCfmMaFormat value.
+
+             The value of a zxAnPonOnuCfmMaName object MUST
+             always be consistent with the value of the associated
+             zxAnPonOnuCfmMaFormat object. Attempts to set
+             an zxAnPonOnuCfmMaName object to a value inconsistent
+             with the associated zxAnPonOnuCfmMaFormat MUST fail
+             with an inconsistentValue error."
+        ::= { zxAnPonRmOnuCfmMaEntry 3 }
+
+    zxAnPonOnuCfmMaCcmInterval OBJECT-TYPE
+        SYNTAX      INTEGER {
+             intervalInvalid   (1),
+             interval300Hz     (2),
+             interval10ms      (3),
+             interval100ms     (4),
+             interval1s        (5),
+             interval10s       (6),
+             interval1min      (7),
+             interval10min     (8)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Indicates the interval at which CCMs are sent by a MEP.
+             The possible values are:
+             intervalInvalid(1)        No CCMs are sent (disabled).
+             interval300Hz(2)   CCMs are sent every 3 1/3 milliseconds
+                                (300Hz).
+             interval10ms(3)    CCMs are sent every 10 milliseconds.
+             interval100ms(4)   CCMs are sent every 100 milliseconds.
+             interval1s(5)      CCMs are sent every 1 second.
+             interval10s(6)     CCMs are sent every 10 seconds.
+             interval1min(7)    CCMs are sent every minute.
+             interval10min(8)   CCMs are sent every 10 minutes."
+        DEFVAL { interval1s }
+        ::= { zxAnPonRmOnuCfmMaEntry 4 }
+
+    zxAnPonOnuCfmMaVlans OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This attribute is a list of up to 12 VLAN IDs with which
+             this MA is associated.
+             The first entry is understood to be the primary VLAN.
+             eg: 100,15-16 means that the primary VLAN is 100, MA is associated
+             with VLAN 15,16,100.
+             A null value indicates the MA is not associated with any VLANs."
+        ::= { zxAnPonRmOnuCfmMaEntry 5 }
+
+    zxAnPonOnuCfmMaMhfCreation OBJECT-TYPE
+        SYNTAX      INTEGER {
+            defMHFnone(1),
+            defMHFdefault(2),
+            defMHFexplicit(3),
+            defMHFdefer(4)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This attribute determines whether the bridge creates a MHF or not,
+             under circumstances defined in IEEE 802.1ag clause 22.2.3.
+             defMHFnone(1), No MHFs can be created for this VID.
+             defMHFdefault(2),  MHFs can be created on this VID on any
+                                Bridge port through which this VID can pass.
+             defMHFexplicit(3), MHFs can be created for this VID only on
+                                Bridge ports through which this VID can
+                                pass, and only if a MEP is created at some
+                                lower MD Level.
+             defMHFdefer(4),    The creation of MHFs is determined by the
+                                corresponding Maintenance Domain variable
+                                (zxAnPonRmOnuCfmMdMhfCreation)."
+        DEFVAL { defMHFdefer }
+        ::= { zxAnPonRmOnuCfmMaEntry 6 }
+
+    zxAnPonOnuCfmMaIdPermission OBJECT-TYPE
+        SYNTAX      INTEGER {
+            sendIdNone(1),
+            sendIdChassis(2),
+            sendIdManage(3),
+            sendIdChassisManage(4),
+            sendIdDefer(5)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This attribute determines the content of the sender ID TLV included
+             in CFM messages transmitted by MP controlled by this MA.
+             sendIdNone(1),     The Sender ID TLV is not to be sent.
+             sendIdChassis(2),  The Chassis ID Length, Chassis ID
+                                Subtype, and Chassis ID fields of  the
+                                Sender ID TLV are to be sent.
+             sendIdManage(3),    The Management Address Length and
+                                Management Address of the Sender ID TLV
+                                are to be sent.
+             sendIdChassisManage(4), The Chassis ID Length, Chassis ID
+                                Subtype, Chassis ID, Management Address
+                                Length and Management Address fields are
+                                all to be sent.
+             sendIdDefer(5),    The contents of the Sender ID TLV are
+                                determined by the corresponding
+                                Maintenance Domain variable
+                                (zxAnPonRmOnuCfmMdMhfIdPermission)."
+        DEFVAL { sendIdDefer }
+        ::= { zxAnPonRmOnuCfmMaEntry 7 }
+
+    zxAnPonOnuCfmMaRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This attribute indicates the operation of the entry."
+        ::= { zxAnPonRmOnuCfmMaEntry 50 }
+
+-------------------------------------------------------------------------------
+--8.4 zxAnPonRmOnuCfmMepTable
+-------------------------------------------------------------------------------
+    zxAnPonRmOnuCfmMepTable    OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ZxAnPonRmOnuCfmMepEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This managed entity models a maintenance association end point
+             (MEP) as defined primarily in IEEE 802.1ag 
+              and secondarily in ITU-T Y.1731.
+             This table only used by GPON service."
+        REFERENCE   "G.984.4 9.3.22 Dot1ag MEP"
+        ::= { zxAnPonRmOnuCfmObjects 4 }
+
+    zxAnPonRmOnuCfmMepEntry OBJECT-TYPE
+        SYNTAX      ZxAnPonRmOnuCfmMepEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "It is entry in the zxAnPonRmOnuCfmMepTable."
+        INDEX   { ifIndex, zxAnPonOnuIndex, 
+                 zxAnPonRmOnuCfmMdId, zxAnPonOnuCfmMaId, zxAnPonOnuCfmMepId }
+        ::= { zxAnPonRmOnuCfmMepTable 1 }
+
+    ZxAnPonRmOnuCfmMepEntry ::=
+        SEQUENCE {
+            zxAnPonOnuCfmMepId                      Integer32,
+            zxAnPonOnuCfmMepEthUniId                ZxAnPonRmOnuUniIndex,
+            zxAnPonOnuCfmMepCcmEnabled              INTEGER,
+            zxAnPonOnuCfmMepServerEnable            INTEGER,
+            zxAnPonOnuCfmMepDirection               INTEGER,
+            zxAnPonOnuCfmMepPrimaryVid              Integer32,
+            zxAnPonOnuCfmMepAdminState              INTEGER,
+            zxAnPonOnuCfmMepPri                     Integer32,
+            zxAnPonOnuCfmMepEgressId                OCTET STRING,
+            zxAnPonOnuCfmMepRmepIds                 DisplayString,
+            zxAnPonOnuCfmMepAisEnable               INTEGER,
+            zxAnPonOnuCfmMepAisPeriod               INTEGER,
+            zxAnPonOnuCfmMepAisPriority             Integer32,
+            zxAnPonOnuCfmMepAisLevel                Integer32,
+            zxAnPonOnuCfmMepAlarmThreshold          INTEGER,
+            zxAnPonOnuCfmMepAlarmDeSoakTime         Integer32,
+            zxAnPonOnuCfmMepAlarmCSoakTime          Integer32,
+            zxAnPonOnuCfmMepRowStatus               RowStatus
+            }
+
+    zxAnPonOnuCfmMepId OBJECT-TYPE
+        SYNTAX      Integer32(1..8191)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This attribute specifies the MEP's own identity in the MA."
+        ::= { zxAnPonRmOnuCfmMepEntry 1 }
+
+    zxAnPonOnuCfmMepEthUniId OBJECT-TYPE
+        SYNTAX      ZxAnPonRmOnuUniIndex
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "This attribute specifies the associated Ethernet port."
+       REFERENCE
+           "ITU G988. clause 9.3.22"
+        ::= { zxAnPonRmOnuCfmMepEntry 2 }
+
+    zxAnPonOnuCfmMepCcmEnabled OBJECT-TYPE
+        SYNTAX      INTEGER {
+            enabled  (1),
+            disabled (2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "If set to true, the MEP will generate CCM messages."
+        REFERENCE
+           "802.1ag clauses 12.14.7.1.3:g and 20.10.1"
+        DEFVAL { disabled }
+        ::= { zxAnPonRmOnuCfmMepEntry 3 }
+
+    zxAnPonOnuCfmMepServerEnable OBJECT-TYPE
+        SYNTAX      INTEGER {
+            enabled  (1),
+            disabled (2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This attribute specifies that wether to
+             enable Y.1731 server MEP function."
+       REFERENCE
+           "ITU G988. clause 9.3.22"
+        DEFVAL { disabled }
+        ::= { zxAnPonRmOnuCfmMepEntry 4 }
+
+    zxAnPonOnuCfmMepDirection OBJECT-TYPE
+        SYNTAX      INTEGER{
+            down(1),
+            up(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "The direction in which the MEP faces on the Bridge port.
+           Indicates the direction in which the Maintenance
+           association (MEP or MIP) faces on the bridge port:
+
+           down(1)    Sends Continuity Check Messages away from the
+                      MAC Relay Entity.
+           up(2)      Sends Continuity Check Messages towards the
+                      MAC Relay Entity."
+       REFERENCE
+           "ITU G988. clause 9.3.22"
+        DEFVAL { down }
+        ::= { zxAnPonRmOnuCfmMepEntry 5}
+
+    zxAnPonOnuCfmMepPrimaryVid OBJECT-TYPE
+        SYNTAX      Integer32  (0..4094)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "An integer indicating the Primary VID of the MEP, always
+            one of the VIDs assigned to the MEP's MA.  The value 0
+            indicates that either the Primary VID is that of the
+            MEP's MA, or that the MEP's MA is associated with no VID."
+       REFERENCE
+           "ITU G988. clause 9.3.22"
+       DEFVAL { 0 }
+        ::= { zxAnPonRmOnuCfmMepEntry 6 }
+
+    zxAnPonOnuCfmMepAdminState OBJECT-TYPE
+        SYNTAX      INTEGER{
+            unlock(1),
+            lock(2)
+         }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "Administrative state of the MEP,
+            unlock indicates that the MEP is to function normally, and
+            lock indicates that it is to cease functioning."
+       REFERENCE
+           "ITU G988. clause 9.3.22"
+       DEFVAL { lock }
+        ::= { zxAnPonRmOnuCfmMepEntry 7 }
+
+    zxAnPonOnuCfmMepPri OBJECT-TYPE
+        SYNTAX      Integer32 (0..7)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "The priority value for CCMs and LTMs transmitted by the MEP.
+            Default Value is the highest priority value allowed to pass
+            through the bridge port for any of this MEPs VIDs.
+            The management entity can obtain the default value for this
+            variable from the priority regeneration table by extracting the
+            highest priority value in this table on this MEPs bridge port.
+            (1 is lowest, then 2, then 0, then 3-7).
+            "
+       REFERENCE
+           "ITU G988. clause 9.3.22"
+       DEFVAL { 7 }
+        ::= { zxAnPonRmOnuCfmMepEntry 8 }
+
+    zxAnPonOnuCfmMepEgressId OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(8))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This attribute comprises 8 bytes to be included in LTMs.
+             They allow received LTRs to be directed to the correct originator.
+             The attribute includes the originator MAC address and a
+             locally-defined identifier. If this field is 0 (default),
+             the ONT uses the MEP's MAC address, with 0 as the locally-defined
+             identifier."
+       REFERENCE
+           "ITU G988. clause 9.3.22"
+        ::= { zxAnPonRmOnuCfmMepEntry 9 }
+
+    zxAnPonOnuCfmMepRmepIds OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This attribute lists up to 12 expected peer MEPs for CCMs,
+             [IEEE 802.1ag] allows for multipoint networks, and therefore a list 
+              of peer MEPs. This attribute allows for up to 12 peers for a 
+              given MEP, though G-PON applications are expected to need only 
+              a single peer. Missing or unexpected messages trigger alarm 
+              declaration after a soak interval. 
+              it should be set to null if unused peer MEP.
+              e.g., 1,3-5 means the used peer MEPs are 1,3,4,5."
+       REFERENCE
+           "ITU G988. clause 9.3.22"
+        ::= { zxAnPonRmOnuCfmMepEntry 10 }
+
+    zxAnPonOnuCfmMepAisEnable OBJECT-TYPE
+        SYNTAX      INTEGER {
+            enabled  (1),
+            disabled (2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This attribute enable generation of Ethernet AIS."
+        DEFVAL { disabled }
+        ::= { zxAnPonRmOnuCfmMepEntry 11 }
+
+    zxAnPonOnuCfmMepAisPeriod OBJECT-TYPE
+        SYNTAX      INTEGER {
+            time1s(1),
+            time1min(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This attribute specifies ethernet AIS transmission period."
+        DEFVAL { time1s }
+        ::= { zxAnPonRmOnuCfmMepEntry 12 }
+
+    zxAnPonOnuCfmMepAisPriority OBJECT-TYPE
+        SYNTAX      Integer32(0..7)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This attribute specifies priority of transmitted ETH AIS frames."
+        DEFVAL { 7 }
+        ::= { zxAnPonRmOnuCfmMepEntry 13 }
+
+    zxAnPonOnuCfmMepAisLevel OBJECT-TYPE
+        SYNTAX      Integer32(0..7)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This attribute specifies the maintenance
+             level at which the client MEP exists."
+        DEFVAL { 0 }
+        ::= { zxAnPonRmOnuCfmMepEntry 14 }
+
+    zxAnPonOnuCfmMepAlarmThreshold OBJECT-TYPE
+        SYNTAX      INTEGER {
+            mode1(1),
+            mode2(2),
+            mode3(3),
+            mode4(4),
+            mode5(5),
+            mode6(6)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This attribute specifies the lowest priority alarm
+             that is allowed to generate a fault alarm.
+             mode1, All defects generate alarms after suitable soaking,
+                    including AIS and RDICCM.
+             mode2, Alarm generated only by one of: MACstatus, RemoteCCM,
+                    ErrorCCM, XconCCM.
+             mode3, Alarm generated only by one of: RemoteCCM, ErrorCCM, XconCCM
+             mode4, Alarm generated only by one of: ErrorCCM, XconCCM.
+             mode5, Alarm generated only by: XconCCM.
+             mode6, No alarms are to be reported."
+        DEFVAL { mode2 }
+        ::= { zxAnPonRmOnuCfmMepEntry 15 }
+
+    zxAnPonOnuCfmMepAlarmDeSoakTime OBJECT-TYPE
+        SYNTAX      Integer32(250..1000)
+        UNITS       "10ms"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This attribute defines the defect soak time
+             that must elapse before the MEP declares an alarm."
+        DEFVAL { 250 }
+        ::= { zxAnPonRmOnuCfmMepEntry 16 }
+
+    zxAnPonOnuCfmMepAlarmCSoakTime OBJECT-TYPE
+        SYNTAX      Integer32(250..1000)
+        UNITS       "10ms"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This attribute defines the defect-free soak time
+             that must elapse before the MEP clears an alarm."
+        DEFVAL { 1000 }
+        ::= { zxAnPonRmOnuCfmMepEntry 17 }
+
+    zxAnPonOnuCfmMepRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This attribute indicates the operation of the entry."
+        ::= { zxAnPonRmOnuCfmMepEntry 50 }
+
+
+--------------------------------------------------------------------------------
+--   zxAnPonRmOnuPppoeTestTable
+--------------------------------------------------------------------------------
+
+    zxAnPonRmOnuPppoeTestTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ZxAnPonRmOnuPppoeTestEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The table lists PPPoE test entry. the entry indicates the test."
+        REFERENCE
+            "GPON in ZXPON ZTE private OMCI & PLOAM Specification 3.8.4;
+            EPON in ZXPON ZTE private extended OAM Specification 3.3.5"
+        ::= { zxAnPonRmOnuOamObjects 2 }
+
+    zxAnPonRmOnuPppoeTestEntry OBJECT-TYPE
+        SYNTAX      ZxAnPonRmOnuPppoeTestEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in the zxAnPonRmOnuPppoeTestTable."
+        INDEX       { ifIndex, zxAnPonOnuIndex, zxAnPonRmOnuIfIndex}
+        ::= { zxAnPonRmOnuPppoeTestTable 1 }
+
+    ZxAnPonRmOnuPppoeTestEntry ::= SEQUENCE {
+        zxAnPonRmPppoeTestVid          Integer32,
+        zxAnPonRmPppoeTestUsername     DisplayString,
+        zxAnPonRmPppoeTestPassword     DisplayString,
+        zxAnPonRmPppoeTestAuthMode     INTEGER,
+        zxAnPonRmPppoeTestAction       INTEGER,
+        zxAnPonRmPppoeTestStatus       INTEGER,
+        zxAnPonRmPppoeTestFailReason   INTEGER
+    }
+
+    zxAnPonRmPppoeTestVid OBJECT-TYPE
+        SYNTAX      Integer32 (0..4094)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The VLAN of interface which will be used in testing datagram.
+
+            0 means that test will use the PVID of interface.
+            Non-zero value must be within the tagged VLAN list of interface. If
+            ONU can not find the VLAN in the tagged VLAN list of interface, test
+            will fail."
+        DEFVAL { 0 }
+        ::= { zxAnPonRmOnuPppoeTestEntry 1 }
+
+    zxAnPonRmPppoeTestUsername  OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..64))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The user name.max size is 64 for epon, 25 for gpon"
+        ::= { zxAnPonRmOnuPppoeTestEntry 2 }
+
+    zxAnPonRmPppoeTestPassword  OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The password.max size is 32 for EPON, 25 for GPON"
+        ::= { zxAnPonRmOnuPppoeTestEntry 3 }
+
+    zxAnPonRmPppoeTestAuthMode  OBJECT-TYPE
+        SYNTAX      INTEGER {
+            auto(1),
+            chap(2),
+            pap(3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The protocol that is used to anthenticate user."
+        DEFVAL { auto }
+        ::= { zxAnPonRmOnuPppoeTestEntry 4 }
+
+    zxAnPonRmPppoeTestAction OBJECT-TYPE
+        SYNTAX      INTEGER {
+            start(1),
+            stop(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The object is used to start or stop test.
+             start(1) - Start the test.
+             stop(2)  - Stop the test."
+        ::= { zxAnPonRmOnuPppoeTestEntry 5 }
+
+    zxAnPonRmPppoeTestStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            notStarted(1),
+            inProgress(2),
+            success(3),
+            failed(4)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of test. Agent need keep this parameter updated so that
+            manager can get the latest status of test by polling.
+
+            notStarted(1) - test is not started
+            inProgress(2) - test is in progress
+            success(3) - test is completed successfully
+            failed(4) - test failed."
+        ::= { zxAnPonRmOnuPppoeTestEntry 6 }
+
+    zxAnPonRmPppoeTestFailReason OBJECT-TYPE
+        SYNTAX      INTEGER {
+            none(1),
+            unknownError(2),
+            hardwareNotSupport(3),
+            vlanNotExist(4),
+            padiTimeOut(5),
+            padrTimeOut(6),
+            lcpNegotiationFail(7),
+            userAuthFail(8),
+            ipNegotiationFail(9)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The failed reason of test.
+
+            none(1)               - no error
+            unknownError(2)       - unknown error
+            hardwareNotSupport(3) - Hardware does not support the test.
+            notFindVlan(4)        - Specified VLAN is not existed.
+            padiTimeOut(5)        - PADI request timed out.
+            padrTimeOut(6)        - PADR request timed out.
+            lcpNegotiationFail(7) - LCP negotiation failed.
+            userAuthFail(8)       - User name or password is invalid.
+            ipNegotiationFail(9)  - IP negotiation failed."
+        ::= { zxAnPonRmOnuPppoeTestEntry 7 }
+
+
+--------------------------------------------------------------------------------
+--   zxAnPonRmOnuIpoeTestTable
+--------------------------------------------------------------------------------
+
+    zxAnPonRmOnuIpoeTestTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ZxAnPonRmOnuIpoeTestEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The table lists IPoE test entry. the entry indicates the test."
+        REFERENCE
+            "GPON in ZXPON ZTE private OMCI & PLOAM Specification 3.8.5~3.8.6;
+            EPON in ZXPON ZTE private extended 
+            OAM Specification 3.3.2.30~3.3.2.31"
+        ::= { zxAnPonRmOnuOamObjects 3 }
+
+    zxAnPonRmOnuIpoeTestEntry OBJECT-TYPE
+        SYNTAX      ZxAnPonRmOnuIpoeTestEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in the zxAnPonRmOnuIpoeTestTable."
+        INDEX       { ifIndex, zxAnPonOnuIndex, zxAnPonRmOnuIfIndex}
+        ::= { zxAnPonRmOnuIpoeTestTable 1 }
+
+    ZxAnPonRmOnuIpoeTestEntry ::= SEQUENCE {
+        zxAnPonRmIpoeTestAuthMode           INTEGER,
+        zxAnPonRmIpoeTestUsername           DisplayString,
+        zxAnPonRmIpoeTestPassword           DisplayString,
+        zxAnPonRmIpoeTestClientMac          MacAddress,
+        zxAnPonRmIpoeTestOption60           DisplayString,
+        zxAnPonRmIpoeTestVid                Integer32,
+        zxAnPonRmIpoeTestTimeout            Integer32,
+        zxAnPonRmIpoeTestClientIpType       InetAddressType,
+        zxAnPonRmIpoeTestClientIpAddr       InetAddress,
+        zxAnPonRmIpoeTestGatewayIpType      InetAddressType,
+        zxAnPonRmIpoeTestGatewayIpAddr      InetAddress,
+        zxAnPonRmIpoeTestPingTimes          Integer32,
+        zxAnPonRmIpoeTestPingSucTimes       Integer32,
+        zxAnPonRmIpoeTestPingMaxDelay       Integer32,
+        zxAnPonRmIpoeTestPingMinDelay       Integer32,
+        zxAnPonRmIpoeTestPingAvgDelay       Integer32,
+        zxAnPonRmIpoeTestAction             INTEGER,
+        zxAnPonRmIpoeTestStatus             INTEGER,
+        zxAnPonRmIpoeTestFailReason         INTEGER
+    }
+
+    zxAnPonRmIpoeTestAuthMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+            option60String(1),
+            usernameAndPassword(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "IPoE test authentication mode.
+             option60String(1)      - authenticate using
+                                      zxAnPonRmIpoeTestOption60String.
+             usernameAndPassword(2) - authenticate using 
+                                      zxAnPonRmIpoeTestUsername
+                                      and zxAnPonRmIpoeTestPassword."
+        REFERENCE
+            "GPON in ZXPON ZTE private OMCI & PLOAM Specification 3.8.5~3.8.6;
+            EPON in ZXPON ZTE private extended 
+            OAM Specification 3.3.2.30~3.3.2.31"
+        DEFVAL      { option60String }
+        ::= { zxAnPonRmOnuIpoeTestEntry 1 }
+
+    zxAnPonRmIpoeTestUsername  OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The user name.
+             This object is valid when zxAnPonRmIpoeTestAuthMode is
+             usernameAndPassword(2)."
+        REFERENCE
+            "GPON in ZXPON ZTE private OMCI & PLOAM Specification 3.8.5~3.8.6;
+            EPON in ZXPON ZTE private extended 
+            OAM Specification 3.3.2.30~3.3.2.31"
+        ::= { zxAnPonRmOnuIpoeTestEntry 2 }
+
+    zxAnPonRmIpoeTestPassword  OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..16))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The password. Max size is 16 for epon and gpon.
+             This object is valid when zxAnPonRmIpoeTestAuthMode is
+             usernameAndPassword(2)."
+        ::= { zxAnPonRmOnuIpoeTestEntry 3 }
+
+    zxAnPonRmIpoeTestClientMac  OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The IPoE test client MAC address."
+        ::= { zxAnPonRmOnuIpoeTestEntry 4 }
+
+    zxAnPonRmIpoeTestOption60  OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..128))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The option60 for IPoE test.
+             This object is valid when zxAnPonRmIpoeTestAuthMode is
+             option60String(1).
+            "
+        ::= { zxAnPonRmOnuIpoeTestEntry 5 }
+
+    zxAnPonRmIpoeTestVid OBJECT-TYPE
+        SYNTAX      Integer32 (0..4094)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The VLAN id of interface which will be used in testing datagram.
+
+            0 means that test will use the PVID of interface.
+            Non-zero value must be within the tagged VLAN list of interface. If
+            ONU can not find the VLAN in the tagged VLAN list of interface, test
+             will fail."
+        DEFVAL { 0 }
+        ::= { zxAnPonRmOnuIpoeTestEntry 6 }
+
+   zxAnPonRmIpoeTestTimeout  OBJECT-TYPE
+        SYNTAX      Integer32(5..60)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The IPoE test timed out."
+        DEFVAL      { 30 }
+        ::= { zxAnPonRmOnuIpoeTestEntry 7 }
+
+   zxAnPonRmIpoeTestClientIpType  OBJECT-TYPE
+        SYNTAX       InetAddressType
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "Client IP address type."
+        ::= { zxAnPonRmOnuIpoeTestEntry 8 }
+
+    zxAnPonRmIpoeTestClientIpAddr  OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address that is distributed by BAS when IPoE test is
+             completed successfully.
+            "
+        ::= { zxAnPonRmOnuIpoeTestEntry 9 }
+
+    zxAnPonRmIpoeTestGatewayIpType  OBJECT-TYPE
+        SYNTAX       InetAddressType
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The gateway IP address type."
+        ::= { zxAnPonRmOnuIpoeTestEntry 10 }
+
+    zxAnPonRmIpoeTestGatewayIpAddr  OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The gateway IP address."
+        ::= { zxAnPonRmOnuIpoeTestEntry 11 }
+
+    zxAnPonRmIpoeTestPingTimes OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The all times for IPoE test ping gateway."
+        ::= { zxAnPonRmOnuIpoeTestEntry 12 }
+
+    zxAnPonRmIpoeTestPingSucTimes OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The successful times for IPoE test ping gateway."
+        ::= { zxAnPonRmOnuIpoeTestEntry 13 }
+
+    zxAnPonRmIpoeTestPingMaxDelay OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "milliseconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum delay for IPoE test ping gateway."
+        ::= { zxAnPonRmOnuIpoeTestEntry 14 }
+
+    zxAnPonRmIpoeTestPingMinDelay OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "milliseconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The minimum delay for IPoE test ping gateway."
+        ::= { zxAnPonRmOnuIpoeTestEntry 15 }
+
+    zxAnPonRmIpoeTestPingAvgDelay OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "milliseconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The average delay for IPoE test ping gateway ."
+        ::= { zxAnPonRmOnuIpoeTestEntry 16 }
+
+    zxAnPonRmIpoeTestAction OBJECT-TYPE
+        SYNTAX      INTEGER {
+            start(1),
+            stop(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The object is used to start or stop test.
+
+            start(1) - Start the test.
+            stop(2)  - Stop the test."
+        REFERENCE
+            "GPON in ZXPON ZTE private OMCI & PLOAM Specification 3.8.5~3.8.6;
+            EPON in ZXPON ZTE private extended 
+            OAM Specification 3.3.2.30~3.3.2.31"
+        ::= { zxAnPonRmOnuIpoeTestEntry 17 }
+
+    zxAnPonRmIpoeTestStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            notStarted(1),
+            inProgress(2),
+            success(3),
+            failed(4)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of test. Agent need keep this parameter updated so that
+            manager can get the latest status of test by polling.
+
+            notStarted(1) - test is not started
+            inProgress(2) - test is in progress
+            success(3) - test is completed successfully
+            failed(4) - test failed
+            "
+        ::= { zxAnPonRmOnuIpoeTestEntry 18 }
+
+    zxAnPonRmIpoeTestFailReason OBJECT-TYPE
+        SYNTAX      INTEGER {
+            none(1),
+            ipoeDiscoverTimeOut(2),
+            ipoeRequestTimeOut(3),
+            ipoeAuthFailed(4),
+            ipoeUnavailable(5),
+            ipoeTestTimeOut(6),
+            unknownError(7),
+            vlanNotExist(8)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The failed reason of test.
+
+            none(1)                - no error
+            ipoeDiscoverTimeOut(2) - IPoE discover timed out.
+            ipoeRequestTimeOut(3)  - IPoE request timed out.
+            ipoeAuthFailed(4)      - IPoE authentication failed.
+            ipoeUnavailable(5)     - IPoE unavailable.
+            ipoeTestTimeOut(6)     - IPoE test timed out.
+            unknownError(7)        - unknown error
+            vlanNotExist(8)        - Specified VLAN is not existed.
+            "
+        ::= { zxAnPonRmOnuIpoeTestEntry 19 }
+
+
+--------------------------------------------------------------------------------
+--  zxAnPonRmOnuVoipCalleeTestTable
+--------------------------------------------------------------------------------
+
+    zxAnPonRmOnuVoipCalleeTestTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ZxAnPonRmOnuVoipCalleeTestEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The table lists callee test entry. The entry indicates a test."
+        REFERENCE
+            "GPON in ZXPON ZTE private OMCI & PLOAM Specification 3.8.3;
+            EPON in ZXPON ZTE private extended OAM Specification 3.3.5"
+        ::= { zxAnPonRmOnuOamObjects 5 }
+
+    zxAnPonRmOnuVoipCalleeTestEntry OBJECT-TYPE
+        SYNTAX      ZxAnPonRmOnuVoipCalleeTestEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in the zxAnPonRmOnuVoipCalleeTestTable."
+        INDEX       { ifIndex, zxAnPonOnuIndex, zxAnPonRmOnuIfIndex}
+        ::= { zxAnPonRmOnuVoipCalleeTestTable 1 }
+
+    ZxAnPonRmOnuVoipCalleeTestEntry ::= SEQUENCE {
+        zxAnPonRmCalleeTestDuration     Integer32,
+        zxAnPonRmCalleeTestMaxRingTime  Integer32,
+        zxAnPonRmCalleeTestPortStatus   INTEGER,
+        zxAnPonRmCalleeTestAction       INTEGER,
+        zxAnPonRmCalleeTestStatus       INTEGER,        
+        zxAnPonRmCalleeTestFailReason   INTEGER,
+        zxAnPonRmCalleeTestFailDetail   DisplayString
+    }
+
+    zxAnPonRmCalleeTestDuration OBJECT-TYPE
+        SYNTAX      Integer32(60..300)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The duration of test. Agent should stop test following regular
+            on-hook procedure, if the test hasn't completed after duration yet."
+        DEFVAL{ 90 }
+        ::= { zxAnPonRmOnuVoipCalleeTestEntry 1 }
+
+    zxAnPonRmCalleeTestMaxRingTime OBJECT-TYPE
+        SYNTAX      Integer32(0..65535)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The max ring time of test."
+        DEFVAL{4}
+        ::= { zxAnPonRmOnuVoipCalleeTestEntry 2 }
+
+    zxAnPonRmCalleeTestPortStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            idle(1),
+            ringing(2),
+            offHook(3),
+            connected(4),
+            busyTone(5),
+            onHook(6)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the current status of port.
+
+            idle(1) - The state of port is idle.
+            ringing(2) - The state of port is ringing.
+            offHook(3) - The state of port is off-hook.
+            connected(4) - Voice data path is established. The port can receive
+            and send voice data.
+            busyTone(5) - The port is playing busy tone.
+            onHook(6) - The state of port is on-hook.
+            "
+        ::= { zxAnPonRmOnuVoipCalleeTestEntry 3 }
+        
+    zxAnPonRmCalleeTestAction OBJECT-TYPE
+        SYNTAX      INTEGER {
+            start(1),
+            stop(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The object is used to start or stop test.
+            start(1) - Start the test.
+            stop(2) - Stop the test. Agent should stop test following regular
+            on-hook procedure.
+            "
+        ::= { zxAnPonRmOnuVoipCalleeTestEntry 4 }    
+        
+    zxAnPonRmCalleeTestStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            notStarted(1),
+            inProgress(2),
+            success(3),
+            failed(4)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of test. Agent need keep this parameter updated so that
+            manager can get the latest status of test by polling.
+
+            notStarted(1) - Test is not started.
+            inProgress(2) - Test is in progress.
+            success(3) - Test is successful. It means that the voice path of
+            call is well, while the on-hook operation is successful.
+            failed(4) - Test failed.
+            "
+        ::= { zxAnPonRmOnuVoipCalleeTestEntry 5 }            
+
+    zxAnPonRmCalleeTestFailReason OBJECT-TYPE
+        SYNTAX      INTEGER {
+            other(1),
+            noRing(2),
+            noUpstreamVoice(3),
+            noDownstreamVoice(4),
+            noBidirectionVoice(5)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The failed reason of test.
+
+            other(1) - Other reason.
+            noRing(2) - No ringing.
+            noUpstreamVoice(3) - No upstream voice.
+            noDownstreamVoice(4) - No downstream voice.
+            noBidirectionVoice(5) - No upstream and downstream voice.
+            "
+        ::= { zxAnPonRmOnuVoipCalleeTestEntry 6 }
+
+    zxAnPonRmCalleeTestFailDetail OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The failed detail. This field should be filled when the value of
+            zxAnPonRmCalleeTestFailReason is 'other'."
+        ::= { zxAnPonRmOnuVoipCalleeTestEntry 7 }
+
+
+--------------------------------------------------------------------------------
+--  zxAnPonRmOnuVoipCallerTestTable
+--------------------------------------------------------------------------------
+
+    zxAnPonRmOnuVoipCallerTestTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ZxAnPonRmOnuVoipCallerTestEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The table lists caller test entry. The entry indicates a test."
+        REFERENCE
+            "GPON in ZXPON ZTE private OMCI & PLOAM Specification 3.8.3;
+            EPON in ZXPON ZTE private extended OAM Specification 3.3.5"
+        ::= { zxAnPonRmOnuOamObjects 6 }
+
+    zxAnPonRmOnuVoipCallerTestEntry OBJECT-TYPE
+        SYNTAX      ZxAnPonRmOnuVoipCallerTestEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in the zxAnPonRmOnuVoipCallerTestTable."
+        INDEX       { ifIndex, zxAnPonOnuIndex, zxAnPonRmOnuIfIndex}
+        ::= { zxAnPonRmOnuVoipCallerTestTable 1 }
+
+    ZxAnPonRmOnuVoipCallerTestEntry ::= SEQUENCE {
+        zxAnPonRmCallerTestTimeout        Integer32,
+        zxAnPonRmCallerTestDialedNumber   DisplayString,
+        zxAnPonRmCallerTestPortStatus     INTEGER,
+        zxAnPonRmCallerTestDelay          Integer32,
+        zxAnPonRmCallerTestSipFailReason  INTEGER,
+        zxAnPonRmCallerTestSipErrorCode   INTEGER,
+        zxAnPonRmCallerTestAction         INTEGER,
+        zxAnPonRmCallerTestStatus         INTEGER,
+        zxAnPonRmCallerTestFailReason     INTEGER,
+        zxAnPonRmCallerTestFailDetail     DisplayString
+    }
+
+    zxAnPonRmCallerTestTimeout OBJECT-TYPE
+        SYNTAX      Integer32(60..300)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The time-out of test. Agent should stop test following regular
+            on-hook procedure, if the test hasn't completed after time-out yet."
+        DEFVAL{ 90 }
+        ::= { zxAnPonRmOnuVoipCallerTestEntry 1 }
+
+    zxAnPonRmCallerTestDialedNumber OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The number that user dials.
+            The max size is 64 for EPON ,20 for GPON.
+            "
+        ::= { zxAnPonRmOnuVoipCallerTestEntry 2 }
+
+    zxAnPonRmCallerTestPortStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            idle(1),
+            offHook(2),
+            dialTone(3),
+            receiveNumber(4),
+            receiveEnd(5),
+            ringBackTone(6),
+            connected(7),
+            busyTone(8),
+            onHook(9)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the current status of port.
+
+            idle(1) - The state of port is idle.
+            offHook(2) - The state of port is off-hook.
+            dialTone(3) - The port is playing dial tone.
+            receiveNumber(4) - The port is receiving number.
+            receiveEnd(5) - Receiving number ended.
+            ringBackTone(6) - The port is playing ring back tone.
+            connected(7) - Voice data path is established. The port can receive
+            and send voice data.
+            busyTone(8) - The port is playing busy tone.
+            onHook(9) - The state of port is on-hook.
+            "
+        ::= { zxAnPonRmOnuVoipCallerTestEntry 3 }
+
+    zxAnPonRmCallerTestDelay OBJECT-TYPE
+        SYNTAX      Integer32(0..65535)
+        UNITS       "0.1second"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies how long it takes to set up bearer traffic RTP packets
+            for the POTS line being tested in tenths of a second.The delay
+            measure timer starts when the INVITE is generated for a call
+            origination to the phone number specified by the PHONENO
+            parameter in the DGN-SIPDIALTONE TL1 command. The SIP
+            application at the ONU starts listening for RTP packets. If RTP
+            packets are detected, the delay measure timer is stopped and
+            the timer value is recorded for later reporting. Range for measure
+            post dial delay is 0.0 to 6553.5 in tenths of seconds."
+        ::= { zxAnPonRmOnuVoipCallerTestEntry 4 }
+
+    zxAnPonRmCallerTestSipFailReason  OBJECT-TYPE
+        SYNTAX      INTEGER {
+            dialToneTestFailure(1),
+            inviteOkButNoBearerData(2),
+            callTimeoutNo200Ok(3),
+            noResponseToInvite(4),
+            errorCodeAndReasonPhrase(5),
+            callCancelledByServer(6),
+            callCancelledByOnt(7),
+            lineNotConfigured(8),
+            lineNotInValidState(9),
+            lineNotRegistered(10),
+            notchFiltersRequired(11)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The failed reason of SIP test. This field should be filled when the
+            value of zxAnPonRmCallerTestFailReason is 'sipTestFailed'.
+
+            dialToneTestFailure(1) - Dial tone test failure.
+            inviteOkButNoBearerData(2) - No bearer traffic was received even
+            though the test call was successful.
+            callTimeoutNo200Ok(3) - The test call never completed although
+            provisional response were received for the INVITE request.
+            noResponseToInvite(4) - No response was received to the INVITE
+            request and attempts to retry the INVITE timed out without a
+            response.
+            errorCodeAndReasonPhrase(5) - The softswitch returned an error to
+            the INVITE request.
+            callCancelledByServer(6) - The softswitch sent a CANCEL for the
+            INVITE transaction.
+            callCancelledByOnt(7) - The call was cancelled by the ONT.
+            lineNotConfigured(8) - The POTS line is not fully configured,
+            probably due to missing SIP provisioning data.
+            lineNotInValidState(9)- The POTS line is in the wrong status to
+            perform the test.
+            lineNotRegistered(10) - The POTS line is not registered with the
+            softswitch.
+            notchFiltersRequired(11) - The notch filter settings in the
+            configuration profile analog data were missing.
+            "
+        ::= { zxAnPonRmOnuVoipCallerTestEntry 5 }
+
+    zxAnPonRmCallerTestSipErrorCode OBJECT-TYPE
+        SYNTAX      INTEGER {
+            unauthorized(1),
+            forbidden(2),
+            notFound(3),
+            proxyAuthenticationRequired(4),
+            requestTimeout(5),
+            temporarilyUnavailable(6),
+            addressIncomplete(7),
+            busyHere(8),
+            requestTerminated(9),
+            notAcceptableHere(10),
+            serverInternalError(11),
+            serviceUnavailable(12),
+            serverTimeout(13)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The error code of SIP test. This field should be filled when the
+            value of zxAnPonRmCallerTestSipFailReason is
+            'errorCodeAndReasonPhrase'.
+
+            unauthorized(1) - 401 Unauthorized.
+            forbidden(2) - 403 Forbidden.
+            notFound(3) - 404 Not found.
+            proxyAuthenticationRequired(4) - 407 Proxy authentication required.
+            requestTimeout(5) - 408 Request timeout.
+            temporarilyUnavailable(6) - 480 Temporarily unavailable.
+            addressIncomplete(7) - 484 Address incomplete.
+            busyHere(8) - 486 Busy here.
+            requestTerminated(9) - 487 Request terminated.
+            notAcceptableHere(10) - 488 Not acceptable here.
+            serverInternalError(11) - 500 Server internal error.
+            serviceUnavailable(12) - 503 Service unavailable.
+            serverTimeout(13) - 504 Server time-out.
+            "
+        ::= { zxAnPonRmOnuVoipCallerTestEntry 6 }
+
+    zxAnPonRmCallerTestAction OBJECT-TYPE
+        SYNTAX      INTEGER {
+            start(1),
+            stop(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The object is used to start or stop test.
+
+            start(1) - Start the test.
+            stop(2) - Stop the test. Agent should stop test following regular
+            on-hook procedure.
+            "
+        ::= { zxAnPonRmOnuVoipCallerTestEntry 7 }
+        
+        
+    zxAnPonRmCallerTestStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            notStarted(1),
+            inProgress(2),
+            success(3),
+            failed(4),
+            notForced(5)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of test. Agent need keep this parameter updated so that
+            manager can get the latest status of test by polling.
+
+            notStarted(1) - Test is not started.
+            inProgress(2) - Test is in progress.
+            success(3) - Test is successful. It means that the voice path of
+            call is well, while the on-hook operation is successful.
+            failed(4) - Test failed.
+            notForced(5)  - Test is not attempted because the POTS line is busy.
+            "
+        ::= { zxAnPonRmOnuVoipCallerTestEntry 8 }
+        
+    zxAnPonRmCallerTestFailReason OBJECT-TYPE
+        SYNTAX      INTEGER {
+            other(1),
+            noDialTone(2),
+            noRingBack(3),
+            noAnswer(4),
+            noUpstreamVoice(5),
+            noDownstreamVoice(6),
+            noBidirectionVoice(7),
+            sipTestFailed(8)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The failed reason of test.
+
+            other(1) - Other reason.
+            noDialTone(2) - No dial tone.
+            noRingBack(3) - No ring back tone.
+            noAnswer(4) - No answer.
+            noUpstreamVoice(5) - No upstream voice.
+            noDownstreamVoice(6) - No downstream voice.
+            noBidirectionVoice(7) - No upstream and downstream voice.
+            sipTestFailed(8) - SIP test failed.
+            "
+        ::= { zxAnPonRmOnuVoipCallerTestEntry 9 }
+        
+
+    zxAnPonRmCallerTestFailDetail OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The failed detail. This field should be filled when the value of
+            zxAnOnuVoipCallerTestFailReason is 'other'."
+        ::= { zxAnPonRmOnuVoipCallerTestEntry 10 }
+
+--------------------------------------------------------------------------------
+-- zxAnPonRmOnuOTransceiversTable
+--------------------------------------------------------------------------------
+    zxAnPonRmOnuOTransceiversTable    OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ZxAnPonRmOnuOTransceiversEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "ONU optical transceivers table."
+        ::= { zxAnPonRmOnuOamObjects 7 }
+
+    zxAnPonRmOnuOTransceiversEntry OBJECT-TYPE
+        SYNTAX      ZxAnPonRmOnuOTransceiversEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "ONU optical transceivers entry."
+        INDEX   { ifIndex, zxAnPonOnuIndex }
+        ::= { zxAnPonRmOnuOTransceiversTable 1 }
+
+    ZxAnPonRmOnuOTransceiversEntry ::=
+        SEQUENCE {            
+            zxAnPonRmOnuOTSpeedMode              INTEGER,
+            zxAnPonRmOnuOTOdnType                INTEGER,
+            zxAnPonRmOnuOTApplicableDevType      INTEGER,            
+            zxAnPonRmOnuOTEncapsulationType      INTEGER,
+            zxAnPonRmOnuOTTxWavelength           Integer32,
+            zxAnPonRmOnuOTRxWavelength           Integer32,
+            zxAnPonRmOnuOTVendorName             DisplayString,
+            zxAnPonRmOnuOTVendorPn               DisplayString,
+            zxAnPonRmOnuOTVendorSn               DisplayString
+            } 
+    
+    zxAnPonRmOnuOTSpeedMode OBJECT-TYPE
+        SYNTAX      INTEGER{
+            gpon(1),
+            xgpon(2),
+            xgspon(3),
+            epon(11),
+            oneGAndTenGEpon(12),
+            tenGAnd10GEpon(13),
+            unknown(255)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ONU optical transceivers speed mode.
+             The following values are valid for GPON:
+                 gpon(1): GPON,
+                 xgpon(2): XG-PON,
+                 xgspon(3): XGS-PON,
+                 unknown(255): unknown.
+             The following values are valid for EPON:
+                 oneG(11): EPON,
+                 oneGAndTenGEpon(12): 1G/10G-EPON, 
+                 tenGAnd10GEpon(13): 10G/10G-EPON,
+                 unknown(255): unknown."
+        ::= { zxAnPonRmOnuOTransceiversEntry 1 }  
+        
+    zxAnPonRmOnuOTOdnType OBJECT-TYPE
+        SYNTAX      INTEGER{
+            classBplusAndCplus(1),
+            n1AndN2aAndE1AndE2a(2),
+            n2bAndE2b(3),
+            n1AndN2AndE1(4),
+            px20(51),
+            px20plus(52),
+            prx30(53),
+            pr30(54),
+            prx40(55),
+            pr40(56),
+            unknown(255)            
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ONU optical transceivers ODN type.
+             The following values are valid for GPON:
+                 classBplusAndCplus(1): Class B+/C+,
+                 n1AndN2aAndE1AndE2a(2): N1/N2a/E1/E2a,
+                 n2bAndE2b(3): N2b/E2b,
+                 n1AndN2AndE1(4): N1/N2/E1.
+             The following values are valid for EPON:
+                 px20(51): PX20,
+                 px20plus(52): PX20+,
+                 prx30(53): PRX30,
+                 pr30(54): PR30,
+                 prx40(55): PRX40,
+                 pr40(56): PR40,
+                 unknown(255): unknown."
+        ::= { zxAnPonRmOnuOTransceiversEntry 2 }
+
+    zxAnPonRmOnuOTApplicableDevType OBJECT-TYPE
+        SYNTAX      INTEGER{
+            onu(1),
+            unknown(255)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ONU optical transceivers applicable device type."
+        ::= { zxAnPonRmOnuOTransceiversEntry 3 } 
+
+    zxAnPonRmOnuOTEncapsulationType OBJECT-TYPE
+        SYNTAX      INTEGER{
+            sfpAndsfpplus(1),
+            xfp(2),
+            unknown(255)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ONU optical transceivers encapsulation type.
+             sfpAndsfpplus(1): SFP/SFP+,
+             xfp(2): XFP,
+             unknown(255): unknown."
+        ::= { zxAnPonRmOnuOTransceiversEntry 4 } 
+
+    zxAnPonRmOnuOTTxWavelength OBJECT-TYPE
+        SYNTAX      Integer32(0..65535)
+        UNITS       "nm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ONU optical transceivers transmitted wavelength."
+        ::= { zxAnPonRmOnuOTransceiversEntry 5 }
+        
+    zxAnPonRmOnuOTRxWavelength OBJECT-TYPE
+        SYNTAX      Integer32(0..65535)
+        UNITS       "nm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ONU optical transceivers received wavelength."
+        ::= { zxAnPonRmOnuOTransceiversEntry 6 } 
+
+    zxAnPonRmOnuOTVendorName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..16))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ONU optical transceivers vendor name."
+        ::= { zxAnPonRmOnuOTransceiversEntry 7 }
+         
+    zxAnPonRmOnuOTVendorPn OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..16))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ONU optical transceivers vendor part number."
+        ::= { zxAnPonRmOnuOTransceiversEntry 8 }
+                
+    zxAnPonRmOnuOTVendorSn OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..16))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ONU optical transceivers vendor serial number."
+        ::= { zxAnPonRmOnuOTransceiversEntry 9 }
+        
+
+    
+                                                                                            
+  
+END

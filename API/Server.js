@@ -13,8 +13,7 @@ import jwt from 'jsonwebtoken';
 moment.locale('id');
 import 'dotenv/config'
 
-
-const uri = `mongodb://${process.env.MONGO_HOST}/${process.env.MONGO_PORT}`
+const uri = process.env.MONGODB;
 
 
 const client = new MongoClient(uri, {});

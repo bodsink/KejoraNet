@@ -177,7 +177,7 @@ export default class libSnmp {
 
 
             const scanSN = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.500.10.2.3.3.1.18${id.int_olt}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.3.1.18${id.int_olt}`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -201,7 +201,7 @@ export default class libSnmp {
             }
 
             const scanName = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.500.10.2.3.3.1.2${id.int_olt}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.3.1.2${id.int_olt}`);
                 const onuName = stdout.split('\n').filter(Boolean);
 
                 let onu = [];
@@ -221,7 +221,7 @@ export default class libSnmp {
             };
 
             const scanDesc = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.500.10.2.3.3.1.3${id.int_olt}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.3.1.3${id.int_olt}`);
                 const onuName = stdout.split('\n').filter(Boolean);
 
                 let onu = [];
@@ -241,7 +241,7 @@ export default class libSnmp {
             }
 
             const scanPhaseState = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.500.10.2.3.8.1.4${id.int_olt}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.8.1.4${id.int_olt}`);
                 const onuName = stdout.split('\n').filter(Boolean);
 
                 let onu = [];
@@ -266,7 +266,7 @@ export default class libSnmp {
 
             const scanTcont = async () => {
 
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.500.10.2.3.4.1.2${id.int_olt}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.4.1.2${id.int_olt}`);
 
                 const onuName = stdout.split('\n',).filter(Boolean);
 
@@ -290,7 +290,7 @@ export default class libSnmp {
 
             const scanTcontProfil = async () => {
 
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.500.10.2.3.4.1.3${id.int_olt}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.4.1.3${id.int_olt}`);
 
                 const onuName = stdout.split('\n',).filter(Boolean);
 
@@ -314,7 +314,7 @@ export default class libSnmp {
 
             const scanGemport = async () => {
 
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.500.10.2.3.5.1.2${id.int_olt}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.5.1.2${id.int_olt}`);
 
                 const onuName = stdout.split('\n',).filter(Boolean);
 
@@ -338,7 +338,7 @@ export default class libSnmp {
 
             const scanGemportProfil = async () => {
 
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.500.10.2.3.5.1.11${id.int_olt}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.5.1.11${id.int_olt}`);
 
                 const onuName = stdout.split('\n',).filter(Boolean);
 
@@ -361,7 +361,7 @@ export default class libSnmp {
             };
 
             const scanModel = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.4.1.3902.1082.500.20.2.1.2.1.8${id.int_olt}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port}SNMPv2-SMI::enterprises.3902.1082.500.20.2.1.2.1.8${id.int_olt}`);
 
                 const onuName = stdout.split('\n',).filter(Boolean);
 
@@ -382,7 +382,7 @@ export default class libSnmp {
             };
 
             const scanFirmware = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.500.20.2.1.2.1.2${id.int_olt}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.20.2.1.2.1.2${id.int_olt}`);
 
                 const onuName = stdout.split('\n',).filter(Boolean);
 
@@ -407,7 +407,7 @@ export default class libSnmp {
             };
 
             const scanDistance = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.4.1.3902.1082.500.10.2.3.10.1.2${id.int_olt}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.10.1.2${id.int_olt}`);
 
                 const onuName = stdout.split('\n',).filter(Boolean);
 
@@ -429,7 +429,7 @@ export default class libSnmp {
             };
 
             const scanRxOlt = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.500.1.2.4.2.1.2${id.int_olt}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.1.2.4.2.1.2${id.int_olt}`);
 
                 const onuName = stdout.split('\n',).filter(Boolean);
 
@@ -455,7 +455,7 @@ export default class libSnmp {
             };
 
             const scanRxOnu = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.500.20.2.2.2.1.10${id.int_olt}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.20.2.2.2.1.10${id.int_olt}`);
 
                 const onuName = stdout.split('\n',).filter(Boolean);
 
@@ -480,7 +480,7 @@ export default class libSnmp {
             };
 
             const scanTxOnu = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.4.1.3902.1082.500.20.2.2.2.1.14${id.int_olt}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.20.2.2.2.1.14${id.int_olt}`);
 
                 const onuName = stdout.split('\n',).filter(Boolean);
 
@@ -1568,7 +1568,7 @@ export default class libSnmp {
             }
 
             const zxAnGponRmOnuReboot = async () =>{
-                const { stdout, stderr } = await exec(`snmpset -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.4.1.3902.1082.500.20.2.1.10.1.1${id.onu} i 1`);
+                const { stdout, stderr } = await exec(`snmpset -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.20.2.1.10.1.1.285278991.2${id.onu} i 1`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);

@@ -567,17 +567,14 @@ export default class libSnmp {
                     const splitIndex = ifIndex[i].split('INTEGER:').filter(Boolean);
                     const splitInterfaces = splitIndex[0].split('=')[0].trim();
                     const arrayInterfaces = splitInterfaces.replace('IF-MIB::ifIndex.', '').trim();
-
-                    console.log(arrayInterfaces)
-
                     index.push({
                         ifindex: parseInt(arrayInterfaces)
                     });
 
                 }
 
-             
-               
+                console.log(index)
+
                 return index;
             }
 

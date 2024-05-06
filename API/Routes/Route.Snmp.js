@@ -184,7 +184,7 @@ export const snmpRoute = (app, client) => {
         catch (error) {
             console.log(error)
             return next(
-                createError(error.status, 'No response from Devices, cek snmp community or ip address'));
+                createError(400, 'No response from Devices, cek snmp community or ip address'));
         }
     });//get all ifindex info
 

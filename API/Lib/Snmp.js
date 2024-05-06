@@ -573,13 +573,12 @@ export default class libSnmp {
 
                 }
 
-                console.log(index)
 
                 return index;
             }
 
             const ifName = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.2.1.31.1.1.1.1${id.device}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} IF-MIB::ifName${id.device}`);
 
                 const ifName = stdout.split('\n').filter(Boolean);
 
@@ -598,13 +597,12 @@ export default class libSnmp {
                     });
 
                 }
-              //  console.log(index)
-
+          
                 return index;
             }
 
             const ifDesc = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.2.1.2.2.1.2${id.device}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} IF-MIB::ifDescr${id.device}`);
 
                 const ifDesc = stdout.split('\n').filter(Boolean);
 
@@ -635,7 +633,7 @@ export default class libSnmp {
             }
 
             const ifType = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.2.1.2.2.1.3${id.device}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} IF-MIB::ifType${id.device}`);
 
                 const ifDesc = stdout.split('\n').filter(Boolean);
 
@@ -666,7 +664,7 @@ export default class libSnmp {
             }
 
             const ifMtu = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.2.1.2.2.1.4${id.device}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} IF-MIB::ifMtu${id.device}`);
 
                 const ifDesc = stdout.split('\n').filter(Boolean);
 
@@ -697,7 +695,7 @@ export default class libSnmp {
             }
 
             const ifSpeed = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.2.1.2.2.1.5${id.device}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} IF-MIB::ifSpeed${id.device}`);
 
                 const ifDesc = stdout.split('\n').filter(Boolean);
 
@@ -728,7 +726,7 @@ export default class libSnmp {
             }
 
             const ifAdminStatus = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.2.1.2.2.1.7${id.device}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} IF-MIB::ifAdminStatus${id.device}`);
 
                 const ifDesc = stdout.split('\n').filter(Boolean);
 
@@ -759,7 +757,7 @@ export default class libSnmp {
             }
 
             const ifOperStatus = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.2.1.2.2.1.8${id.device}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} IF-MIB::ifOperStatus${id.device}`);
 
                 const ifDesc = stdout.split('\n').filter(Boolean);
 

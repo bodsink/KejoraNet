@@ -555,6 +555,8 @@ export default class libSnmp {
                 id.device = `.${id.device}`
             }
 
+            console.log(id)
+
             const ifIndex = async () => {
                 const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.2.1.2.2.1.1${id.device}`);
 
@@ -805,8 +807,7 @@ export default class libSnmp {
                 }
             });
 
-            console.log(IndexIf)
-
+          
             const arrayIndex = IndexIf.map((item, index) => {
                 return {
                     ...item,

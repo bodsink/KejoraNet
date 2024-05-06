@@ -14,7 +14,7 @@ export default class libSnmp {
         try {
 
             const sysDescr = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.2.1.1.1.0`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-MIB::sysDescr`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -34,7 +34,7 @@ export default class libSnmp {
             }
 
             const sysUpTimeInstance = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.2.1.1.3.0`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} DISMAN-EVENT-MIB::sysUpTimeInstance`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -54,7 +54,7 @@ export default class libSnmp {
             }
 
             const sysContact = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.2.1.1.4.0`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-MIB::sysContact`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -73,7 +73,7 @@ export default class libSnmp {
             }
 
             const sysName = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.2.1.1.5.0`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-MIB::sysName`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -92,7 +92,7 @@ export default class libSnmp {
             }
 
             const sysLocation = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} .1.3.6.1.2.1.1.6.0`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-MIB::sysLocation`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);
@@ -789,8 +789,6 @@ export default class libSnmp {
 
             const [index, name, desc, type, mtu, speed, adminStatus, operStatus] = await Promise.all([ifIndex(), ifName(), ifDesc(), ifType(), ifMtu(), ifSpeed(), ifAdminStatus(), ifOperStatus()]);
 
-           
-           
 
             const IndexIf = index.map((item, index) => {
                 return {

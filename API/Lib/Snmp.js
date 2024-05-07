@@ -1568,7 +1568,7 @@ export default class libSnmp {
             }
 
             const zxAnGponRmOnuReboot = async () =>{
-                const { stdout, stderr } = await exec(`snmpset -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.4.1.3902.1082.500.20.2.1.10.1.1.285278991.2${id.onu} i 1`);
+                const { stdout, stderr } = await exec(`snmpset -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.4.1.3902.1082.500.20.2.1.10.1.1${id.onu} i 1`);
                 if (stderr) throw new Error(stderr);
 
                 const onuName = stdout.split('\n').filter(Boolean);

@@ -12,5 +12,7 @@ when this project was created :
 - depends snmp-mibs-downloader package
 
 ## How to install
-  apt install snmp-mibs-downloader
+
+    npm install
+    npm run build
 

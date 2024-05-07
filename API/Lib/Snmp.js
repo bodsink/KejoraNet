@@ -2,6 +2,7 @@ import { exec as execCb } from "node:child_process";
 import { parse } from "node:path";
 import { promisify } from "node:util";
 const exec = promisify(execCb);
+import createError from 'http-errors';
 
 function hex(str) {
     return Buffer.from(str, 'hex').toString('utf8');
@@ -23,14 +24,14 @@ export default class libSnmp {
 
                 for (let i = 0; i < onuName.length; i++) {
                     const splitName = onuName[i].replace('SNMPv2-MIB::sysDescr.0', '').replace('=', '').replace('STRING:', '').trim().split('.').filter(Boolean);
-            
+
                     sys.push({
                         sysDescr: splitName[0]
                     });
                 }
 
                 return sys;
-                
+
             }
 
             const sysUpTimeInstance = async () => {
@@ -43,14 +44,14 @@ export default class libSnmp {
 
                 for (let i = 0; i < onuName.length; i++) {
                     const splitName = onuName[i].replace('DISMAN-EVENT-MIB::sysUpTimeInstance', '').replace('=', '').replace('Timeticks:', '').trim().split('.').filter(Boolean);
-            
+
                     sys.push({
                         sysUpTimeInstance: splitName[0]
                     });
                 }
 
                 return sys;
-                
+
             }
 
             const sysContact = async () => {
@@ -69,7 +70,7 @@ export default class libSnmp {
                 }
 
                 return sys;
-                
+
             }
 
             const sysName = async () => {
@@ -88,7 +89,7 @@ export default class libSnmp {
                 }
 
                 return sys;
-                
+
             }
 
             const sysLocation = async () => {
@@ -107,7 +108,7 @@ export default class libSnmp {
                 }
 
                 return sys;
-                
+
             }
 
             const [desc, uptime, contact, name, location] = await Promise.all([sysDescr(), sysUpTimeInstance(), sysContact(), sysName(), sysLocation()]);
@@ -122,11 +123,17 @@ export default class libSnmp {
                     sysLocation: location[index].sysLocation,
                 }
             });
-           
+
 
         }
         catch (error) {
-            throw error;
+            const timeout = error.message.includes('Timeout');
+            if (timeout == true) {
+                throw new Error('No Response from community');
+            }
+            else {
+                throw new Error('SNMP Error');
+            }
         }
     };//get system device
 
@@ -543,7 +550,13 @@ export default class libSnmp {
 
         }
         catch (error) {
-            return error;
+            const timeout = error.message.includes('Timeout');
+            if (timeout == true) {
+                throw new Error('No Response from community');
+            }
+            else {
+                throw new Error('SNMP Error');
+            }
         }
     }
 
@@ -597,7 +610,7 @@ export default class libSnmp {
                     });
 
                 }
-          
+
                 return index;
             }
 
@@ -612,7 +625,7 @@ export default class libSnmp {
 
                 for (let i = 0; i < ifDesc.length; i++) {
                     const splitName = ifDesc[i].replace('IF-MIB::ifDescr.', '').replace('=', '').replace('STRING:', '.').trim().split('.').filter(Boolean)
-                   // console.log(splitName)
+                    // console.log(splitName)
                     if (splitName[1] === undefined) {
                         splitName[1] = '';
                     } else {
@@ -803,7 +816,7 @@ export default class libSnmp {
                 }
             });
 
-          
+
             const arrayIndex = IndexIf.map((item, index) => {
                 return {
                     ...item,
@@ -819,10 +832,16 @@ export default class libSnmp {
                 }
             });
 
-           return arrayIndex;
+            return arrayIndex;
         }
         catch (error) {
-            throw error;
+            const timeout = error.message.includes('Timeout');
+            if (timeout == true) {
+                throw new Error('No Response from community');
+            }
+            else {
+                throw new Error('SNMP Error');
+            }
         }
     }
 
@@ -1285,7 +1304,13 @@ export default class libSnmp {
 
         }
         catch (error) {
-            throw error;
+            const timeout = error.message.includes('Timeout');
+            if (timeout == true) {
+                throw new Error('No Response from community');
+            }
+            else {
+                throw new Error('SNMP Error');
+            }
         }
     }
 
@@ -1315,7 +1340,7 @@ export default class libSnmp {
 
 
                 }
-               
+
                 return card;
 
             };//The card main type.
@@ -1381,9 +1406,9 @@ export default class libSnmp {
 
                     const splitName = onuName[i].replace('SNMPv2-SMI::enterprises.3902.1082.10.10.2.1.6.1.2.1.1.', '').replace('=', '.').trim().replace('INTEGER:', '').replace(/\s/g, '').trim().split('.').filter(Boolean);
 
-                    if(splitName[1] === undefined){
+                    if (splitName[1] === undefined) {
                         splitName[1] = 0;
-                    } else if(splitName[1] === '-1000'){
+                    } else if (splitName[1] === '-1000') {
                         splitName[1] = 0;
                     } else {
                         splitName[1] = splitName[1].trim();
@@ -1395,7 +1420,7 @@ export default class libSnmp {
                     });
 
                 }
-               return card;
+                return card;
             };//The card temperature.
 
             const zxAnCardPowerConsumption = async () => {
@@ -1410,9 +1435,9 @@ export default class libSnmp {
 
                     const splitName = onuName[i].replace('SNMPv2-SMI::enterprises.3902.1082.10.10.2.1.6.1.3.1.1.', '').replace('=', '.').trim().replace('INTEGER:', '').replace(/\s/g, '').trim().split('.').filter(Boolean);
 
-                    if(splitName[1] === undefined){
+                    if (splitName[1] === undefined) {
                         splitName[1] = 0;
-                    } else if(splitName[1] === '-1000'){
+                    } else if (splitName[1] === '-1000') {
                         splitName[1] = 0;
                     } else {
                         splitName[1] = splitName[1].trim();
@@ -1424,7 +1449,7 @@ export default class libSnmp {
                     });
 
                 }
-               return card;
+                return card;
             }//The card power consumption.
 
             const zxAnCardOperStatus = async () => {
@@ -1439,9 +1464,9 @@ export default class libSnmp {
 
                     const splitName = onuName[i].replace('SNMPv2-SMI::enterprises.3902.1082.10.1.2.4.1.5.1.1.', '').replace('=', '.').trim().replace('INTEGER:', '').replace(/\s/g, '').trim().split('.').filter(Boolean);
 
-                    if(splitName[1] === undefined){
+                    if (splitName[1] === undefined) {
                         splitName[1] = 0;
-                    } else if(splitName[1] === '-1000'){
+                    } else if (splitName[1] === '-1000') {
                         splitName[1] = 0;
                     } else {
                         splitName[1] = splitName[1].trim();
@@ -1453,11 +1478,11 @@ export default class libSnmp {
                     });
 
                 }
-               return card;
+                return card;
             }//The card power consumption.
 
-           
-          const [mainType, actualType, portNums, temp, power, status] = await Promise.all([zxAnCardConfMainType(), zxAnCardActualType(), zxAnSubcardPortNums(), zxAnCardTemp(), zxAnCardPowerConsumption(), zxAnCardOperStatus()]);
+
+            const [mainType, actualType, portNums, temp, power, status] = await Promise.all([zxAnCardConfMainType(), zxAnCardActualType(), zxAnSubcardPortNums(), zxAnCardTemp(), zxAnCardPowerConsumption(), zxAnCardOperStatus()]);
 
             return mainType.map((item, index) => {
                 return {
@@ -1474,7 +1499,13 @@ export default class libSnmp {
 
         }
         catch (error) {
-            throw error;
+            const timeout = error.message.includes('Timeout');
+            if (timeout == true) {
+                throw new Error('No Response from community');
+            }
+            else {
+                throw new Error('SNMP Error');
+            }
         }
     };//The card information.
 
@@ -1554,7 +1585,13 @@ export default class libSnmp {
 
         }
         catch (error) {
-            throw error;
+            const timeout = error.message.includes('Timeout');
+            if (timeout == true) {
+                throw new Error('No Response from community');
+            }
+            else {
+                throw new Error('SNMP Error');
+            }
         }
 
     };//The PON RM ONU interface protocol configuration entry.
@@ -1567,7 +1604,7 @@ export default class libSnmp {
                 id.onu = `.${id.onu}`
             }
 
-            const zxAnGponRmOnuReboot = async () =>{
+            const zxAnGponRmOnuReboot = async () => {
                 const { stdout, stderr } = await exec(`snmpset -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.4.1.3902.1082.500.20.2.1.10.1.1${id.onu} i 1`);
                 if (stderr) throw new Error(stderr);
 
@@ -1578,9 +1615,9 @@ export default class libSnmp {
                 for (let i = 0; i < onuName.length; i++) {
                     const splitName = onuName[i].replace('SNMPv2-SMI::enterprises.3902.1082.500.20.2.1.10.1.1.285278991.2.', '').replace('=', '.').trim().replace('INTEGER:', '').replace(/\s/g, '').trim().split('.').filter(Boolean);
 
-                   info = {
-                    pesan: 'onu rebooted'
-                   }
+                    info = {
+                        pesan: 'onu rebooted'
+                    }
 
                 }
 
@@ -1593,7 +1630,13 @@ export default class libSnmp {
 
         }
         catch (error) {
-            throw error;
+            const timeout = error.message.includes('Timeout');
+            if (timeout == true) {
+                throw new Error('No Response from community');
+            }
+            else {
+                throw new Error('SNMP Error');
+            }
         }
     };//Reboot Onu
 
@@ -1606,16 +1649,16 @@ export default class libSnmp {
             }
             let vlan = [];
 
-            const VlanList = async () =>{
+            const VlanList = async () => {
                 const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.4.1.3902.1082.40.50.2.1.2.1.2${id.vlan}`);
                 if (stderr) throw new Error(stderr);
 
                 const vlanName = stdout.split('\n').filter(Boolean);
-              
-               
+
+
 
                 for (let i = 0; i < vlanName.length; i++) {
-                    const splitName = vlanName[i].replace('SNMPv2-SMI::enterprises.3902.1082.40.50.2.1.2.1.2.', '').replace('=', '.').trim().replace('STRING:', '').replace(/\s/g, '').trim().replace('"','').trim().replace('"','').trim().split('.').filter(Boolean);
+                    const splitName = vlanName[i].replace('SNMPv2-SMI::enterprises.3902.1082.40.50.2.1.2.1.2.', '').replace('=', '.').trim().replace('STRING:', '').replace(/\s/g, '').trim().replace('"', '').trim().replace('"', '').trim().split('.').filter(Boolean);
 
                     vlan.push({
                         id: parseInt(splitName[0]),
@@ -1629,24 +1672,30 @@ export default class libSnmp {
 
             const [vlanList] = await Promise.all([VlanList()]);
 
-             return vlanList.map((item, index) => {
+            return vlanList.map((item, index) => {
                 return {
                     ...item,
                     id: vlanList[index].id,
                     name: vlanList[index].name,
                 }
-             });
+            });
 
 
         }
         catch (error) {
-            throw error;
+            const timeout = error.message.includes('Timeout');
+            if (timeout == true) {
+                throw new Error('No Response from community');
+            }
+            else {
+                throw new Error('SNMP Error');
+            }
         }
-          
-               
+
+
     };//The OLT VLAN list.
 
-    async onuState(id){
+    async onuState(id) {
         try {
 
             if (id.onu === undefined) {
@@ -1675,7 +1724,7 @@ export default class libSnmp {
                     });
 
                 }
-                
+
                 return onu;
             };
 
@@ -1695,7 +1744,13 @@ export default class libSnmp {
 
         }
         catch (error) {
-            throw error;
+            const timeout = error.message.includes('Timeout');
+            if (timeout == true) {
+                throw new Error('No Response from community');
+            }
+            else {
+                throw new Error('SNMP Error');
+            }
         }
     };//Check ONU LOS
 

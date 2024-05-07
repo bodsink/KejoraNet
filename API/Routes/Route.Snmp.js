@@ -39,69 +39,67 @@ function uptime(id) {
 
 export const snmpRoute = (app, client) => {
 
-    // app.get('/snmp/:id/sys', async (req, res, next) => {
-    //     try {
 
-    //         const { id } = req.params;
-    //         const olt = await client.db(process.env.MONGO_DB).collection('Devices').findOne({ user: req.user, uid: id });
-    //         if (!olt) {
-    //             throw createError(404, 'Devices not found');
-    //         }
+    app.get('/snmp/:id/sys', async (req, res, next) => {
+        try {
 
-    //         const { stdout, stderr } = await exec(`snmpget -M ./mibs:./mibs/zte -m SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB -v2c -c ${olt.snmp_community} -OQXUte -On udp:${olt.ip}:${olt.snmp_port} SNMPv2-MIB::sysObjectID.0  SNMPv2-MIB::sysDescr.0 SNMPv2-MIB::sysName.0 SNMPv2-MIB::sysUpTime.0`);
+            const devices = await client.db(process.env.MONGO_DB).collection('Devices').findOne({ user: req.user, uid: req.params.id });
 
-    //         if (stderr) {
-    //             throw createError(500, stderr);
-    //         }
+            if (!devices) {
+                throw createError(404, 'Device not found');
+            }
 
-    //         const [sysObjectId, sysDescr, sysName, sysUptime] = stdout.split('\n').filter(Boolean);
+            const data = {
+                snmp: devices.snmp,
+                ip: devices.ip,
+                snmp_port: devices.snmp_port,
+            }
 
-    //         let data;
+            const sys = await snmpLib.SystemInformation(data);
+
+            sys.forEach(async (element) => {
+                const cekSys = await client.db(process.env.MONGO_DB).collection('Devices.Sys').findOne({ user: req.user, device: req.params.id });
+
+                if (!cekSys) {
+                    const result = await client.db(process.env.MONGO_DB).collection('Devices.Sys').insertOne({
+                        uid: uuidv4(),
+                        user: req.user,
+                        device: req.params.id,
+                        sysDescr: element.sysDescr,
+                        sysUpTime: element.sysUpTimeInstance,
+                        sysContact: element.sysContact,
+                        sysName: element.sysName,
+                        sysLocation: element.sysLocation,
+                        created_at: moment().unix(),
+                        updated_at: moment().unix()
+                    });
+
+                    return console.log(`System ${element.sysName} created`);
+                } else {
+
+                    const data = {
+                        sysDescr: element.sysDescr,
+                        sysUpTime: element.sysUpTimeInstance,
+                        sysContact: element.sysContact,
+                        sysName: element.sysName,
+                        sysLocation: element.sysLocation,
+                        updated_at: moment().unix()
+                    };
+
+                    const result = await client.db(process.env.MONGO_DB).collection('Devices.Sys').updateOne({ user: req.user, device: req.params.id }, { $set: data });
+
+                    return console.log(`System ${element.sysName} updated`);
 
 
+                }
 
-
-    //         const duplicate = await client.db(process.env.MONGO_DB).collection('Snmp.Devices').findOne({ user: req.user, id: req.params.id });
-    //         const replaceDesc = sysDescr.replace('.1.3.6.1.2.1.1.1.0 = ', '');
-    //         const getDesc = replaceDesc.split(',').filter(Boolean);
-
-    //         if (duplicate) {
-
-    //             data = {
-    //                 uid: duplicate.uid,
-    //                 id: duplicate.id,
-    //                 sysObjectId: sysObjectId.replace('.1.3.6.1.2.1.1.2.0 = ', ''),
-    //                 sysDescr: getDesc[0],
-    //                 sysName: sysName.replace('.1.3.6.1.2.1.1.5.0 = ', ''),
-    //                 sysUptime: uptime(sysUptime.replace('.1.3.6.1.2.1.1.3.0 = ', '') / 100)
-    //             }
-    //             const update = await client.db(process.env.MONGO_DB).collection('Snmp.Devices').updateOne({ user: req.user, id: req.params.id }, { $set: data });
-    //         } else {
-    //             data = {
-    //                 user: req.user,
-    //                 uid: uuidv4(),
-    //                 id: req.params.id,
-    //                 sysObjectId: sysObjectId.replace('.1.3.6.1.2.1.1.2.0 = ', ''),
-    //                 sysDescr: sysDescr.replace('.1.3.6.1.2.1.1.1.0 = ', ''),
-    //                 sysName: sysName.replace('.1.3.6.1.2.1.1.5.0 = ', ''),
-    //                 sysUptime: uptime(sysUptime.replace('.1.3.6.1.2.1.1.3.0 = ', '') / 100)
-    //             }
-    //             const save = await client.db(process.env.MONGO_DB).collection('Snmp.Devices').insertOne(data);
-    //         }
-
-
-
-    //         res.status(200).send({
-    //             data: data
-    //         })
-    //     }
-    //     catch (error) {
-    //         console.log(error)
-    //         return next(
-    //             createError(error.status, error.message));
-    //     }
-    // }); //get device sys info
-
+            });
+        }
+        catch (error) {
+            return next(
+                createError(408, error));
+        }
+    });//get system info by id
 
     app.get('/snmp/:id/ifindex', async (req, res, next) => {
         try {
@@ -182,9 +180,8 @@ export const snmpRoute = (app, client) => {
 
         }
         catch (error) {
-            console.log(error)
             return next(
-                createError(400, 'No response from Devices, cek snmp community or ip address'));
+                createError(408, error));
         }
     });//get all ifindex info
 
@@ -368,9 +365,8 @@ export const snmpRoute = (app, client) => {
 
         }
         catch (error) {
-            console.log(error)
             return next(
-                createError(error.status, error.message));
+                createError(408, error));
         }
 
     });//get device pon interfaces
@@ -799,9 +795,8 @@ export const snmpRoute = (app, client) => {
 
         }
         catch (error) {
-            console.log(error)
             return next(
-                createError('400', error.message));
+                createError(408, error));
         }
     });//get all onu info
 
@@ -883,9 +878,8 @@ export const snmpRoute = (app, client) => {
 
         }
         catch (error) {
-            console.log(error)
             return next(
-                createError(error.status, error.message));
+                createError(408, error));
         }
     });//get all optical info
 
@@ -1201,9 +1195,8 @@ export const snmpRoute = (app, client) => {
             });
         }
         catch (error) {
-            console.log(error)
             return next(
-                createError(error.status, error.message));
+                createError(408, error));
         }
     });//get onu paramater by id
 
@@ -1272,78 +1265,11 @@ export const snmpRoute = (app, client) => {
 
         }
         catch (error) {
-            console.log(error)
             return next(
-                createError('400', error.message));
+                createError(408, error));
         }
     });//get all olt card info
 
-
-    app.get('/snmp/:id/sys', async (req, res, next) => {
-        try {
-
-            const devices = await client.db(process.env.MONGO_DB).collection('Devices').findOne({ user: req.user, uid: req.params.id });
-
-            if (!devices) {
-                throw createError(404, 'Device not found');
-            }
-
-            const data = {
-                snmp: devices.snmp,
-                ip: devices.ip,
-                snmp_port: devices.snmp_port,
-            }
-
-            const sys = await snmpLib.SystemInformation(data);
-
-            sys.forEach(async (element) => {
-                const cekSys = await client.db(process.env.MONGO_DB).collection('Devices.Sys').findOne({ user: req.user, device: req.params.id });
-
-                if (!cekSys) {
-                    const result = await client.db(process.env.MONGO_DB).collection('Devices.Sys').insertOne({
-                        uid: uuidv4(),
-                        user: req.user,
-                        device: req.params.id,
-                        sysDescr: element.sysDescr,
-                        sysUpTime: element.sysUpTimeInstance,
-                        sysContact: element.sysContact,
-                        sysName: element.sysName,
-                        sysLocation: element.sysLocation,
-                        created_at: moment().unix(),
-                        updated_at: moment().unix()
-                    });
-
-                    return console.log(`System ${element.sysName} created`);
-                } else {
-
-                    const data = {
-                        sysDescr: element.sysDescr,
-                        sysUpTime: element.sysUpTimeInstance,
-                        sysContact: element.sysContact,
-                        sysName: element.sysName,
-                        sysLocation: element.sysLocation,
-                        updated_at: moment().unix()
-                    };
-
-                    const result = await client.db(process.env.MONGO_DB).collection('Devices.Sys').updateOne({ user: req.user, device: req.params.id }, { $set: data });
-
-                    return console.log(`System ${element.sysName} updated`);
-
-
-                }
-
-            });
-
-
-
-
-        }
-        catch (error) {
-            console.log(error)
-            return next(
-                createError(error.status, error.message));
-        }
-    });//get system info by id
 
     app.get('/snmp/olt/:id/vlan', async (req, res, next) => {
         try {
@@ -1395,9 +1321,8 @@ export const snmpRoute = (app, client) => {
 
         }
         catch (err) {
-            console.log(err)
             return next(
-                createError(401, err.message));
+                createError(408, error));
         }
     });
 
@@ -1470,9 +1395,8 @@ export const snmpRoute = (app, client) => {
 
         }
         catch (error) {
-            console.log(error)
             return next(
-                createError(400, error.message));
+                createError(408, error));
         }
     });//Check onu los
 

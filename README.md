@@ -12,7 +12,7 @@ when this project was created :
 - depends snmp-mibs-downloader package
 
 ## How to install
+Debian 12
 
-    npm install
-    npm run build
+    apt install snmp-mibs-downloader
 

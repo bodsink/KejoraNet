@@ -215,9 +215,9 @@ export const OltRoute = (app, client) => {
 
         }
         catch (err) {
-            console.log(err)
+            console.log(err.status)
             return next(
-                createError(401, err.message));
+                createError(err.status, err.message));
         }
     });
 

@@ -1646,4 +1646,57 @@ export default class libSnmp {
                
     };//The OLT VLAN list.
 
+    async onuState(id){
+        try {
+
+            if (id.onu === undefined) {
+                id.onu = '';
+            } else {
+                id.onu = `.${id.onu}`
+            }
+
+            const scanPhaseState = async () => {
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.8.1.4${id.onu}`);
+                const onuName = stdout.split('\n').filter(Boolean);
+
+                let onu = [];
+
+                for (let i = 0; i < onuName.length; i++) {
+                    const splitName = onuName[i].split('INTEGER:'); //array 0=id 2=name
+                    const splitInterfaces = splitName[0].split('=')[0]; //
+                    const replaceInterfaces = splitInterfaces.replace('SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.8.1.4.', '').trim();
+                    const arrayInterfaces = replaceInterfaces.split('.').filter(Boolean); //array 0=interfaces 1=Index Of onu
+                    const state = splitName[1].replace('\"', '').replace('\"', '').trim();
+
+                    onu.push({
+                        pon: parseInt(arrayInterfaces[0]),
+                        index: parseInt(arrayInterfaces[1]),
+                        state: parseInt(state),
+                    });
+
+                }
+                
+                return onu;
+            };
+
+            const [scanPhase] = await Promise.all([scanPhaseState()]);
+
+            return scanPhase.map((item, index) => {
+                return {
+                    ...item,
+                    pon: scanPhase[index].pon,
+                    index: scanPhase[index].index,
+                    state: scanPhase[index].state,
+                }
+            });
+
+
+
+
+        }
+        catch (error) {
+            throw error;
+        }
+    };//Check ONU LOS
+
 };

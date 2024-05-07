@@ -1401,6 +1401,82 @@ export const snmpRoute = (app, client) => {
         }
     });
 
+    app.get('/snmp/:id/onulos', async (req, res, next) => {
+        try {
+
+            const ifIndex = await client.db(process.env.MONGO_DB).collection('Devices.IfIndex').aggregate([
+                {
+                    $match: {
+                        user: req.user,
+                        device: req.params.id,
+                        iftype: 'gpon(250)',
+                        ifoperstatus: 'up(1)'
+                    }
+                }, {
+                    $lookup: {
+                        from: 'Devices',
+                        localField: 'device',
+                        foreignField: 'uid',
+                        as: 'olt'
+                    }
+                }, {
+                    $unwind: '$olt'
+                }, {
+                    $project: {
+                        snmp: '$olt.snmp',
+                        ip: '$olt.ip',
+                        snmp_port: '$olt.snmp_port',
+                        ifindex: '$ifindex',
+                        index: '$index',
+                        interfaces: '$interfaces',
+                        alias: '$ifalias'
+                    }
+                }
+            ]).sort({ ifindex: 1 }).toArray();
+
+            if (ifIndex.length == 0) {
+                throw createError(404, 'No pon interfaces found')
+            }
+
+            for (let i = 0; i < ifIndex.length; i++) {
+                const data = {
+                    snmp: ifIndex[i].snmp,
+                    ip: ifIndex[i].ip,
+                    snmp_port: ifIndex[i].snmp_port,
+                    int_olt: ifIndex[i].ifindex
+                }
+
+
+
+                const walk = await snmpLib.onuState(data);
+                walk.forEach(async (element) => {
+                    //console.log(element)
+
+                    const duplicate = await client.db(process.env.MONGO_DB).collection('OLT.Onu').findOne({ user: req.user, olt: req.params.id, pon: element.pon, index: element.index });
+
+                    if (duplicate) {
+                       const compare = duplicate.pon == element.pon && duplicate.index == element.index && duplicate.state == element.state;
+                        if(compare == false){
+                            return console.log(`Onu ${duplicate.sn} state:${duplicate.state} => state:${element.state}`)
+                        }
+                    }
+
+
+                });
+
+
+            }
+
+
+        }
+        catch (error) {
+            console.log(error)
+            return next(
+                createError(400, error.message));
+        }
+    });//Check onu los
+
+
 
 };
 

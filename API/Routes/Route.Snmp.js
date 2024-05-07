@@ -733,7 +733,13 @@ export const snmpRoute = (app, client) => {
                 if (walk.length == 0) {
                     return createError(404, 'No Onu found')
                 } else {
+
                     walk.forEach(async (element) => {
+                        const findState = element.state == '5';
+                        if (findState == true) {
+                            return console.log(`Onu ${element.sn} => PowerOff`) //buat notif 
+                        }
+
                         const datasave = {
                             user: req.user,
                             uid: uuidv4(),

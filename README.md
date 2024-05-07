@@ -10,3 +10,7 @@ when this project was created :
 - MongoDB: 7.0.9
 - Developed using Mac, production on Debian 12
 - depends snmp-mibs-downloader package
+
+## How to install
+  apt install snmp-mibs-downloader
+

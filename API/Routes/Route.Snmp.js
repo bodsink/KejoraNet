@@ -372,311 +372,6 @@ export const snmpRoute = (app, client) => {
     });//get device pon interfaces
 
 
-    // app.get('/snmp/:id/onu', async (req, res, next) => {
-    //     try {
-
-    //         function hex(str) {
-    //             return Buffer.from(str, 'hex').toString('utf8');
-    //         }
-
-
-    //         const olt = await client.db(process.env.MONGO_DB).collection('OLT').findOne({ user: req.user, uid: req.params.id });
-    //         if (!olt) {
-    //             throw createError(404, 'Olt not found');
-    //         }
-
-    //         const data = {
-    //             snmp: olt.snmp_community,
-    //             ip: olt.ip,
-    //             snmp_port: olt.snmp_port
-    //         }
-
-    //         const getSn = async () => {
-
-    //             const onuName = await snmp.GponOnuMgmtSn(data);
-    //             let onu = [];
-
-    //             for (let i = 0; i < onuName.length; i++) {
-    //                 const splitName = onuName[i].split('STRING:'); //array 0=id 2=name
-    //                 const splitInterfaces = splitName[0].split('=')[0]; //
-    //                 const replaceInterfaces = splitInterfaces.replace('SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.3.1.6.', '').trim();
-    //                 const arrayInterfaces = replaceInterfaces.split('.').filter(Boolean); //array 0=interfaces 1=Index Of onu
-
-    //                 const sn = splitName[1].replace('\"', '').replace('\"', '').trim();
-    //                 const replaceSN = sn.replace(/\s/g, '');
-    //                 const vendorid = replaceSN.substring(0, 8);
-    //                 const modelid = replaceSN.substring(8, replaceSN.length);
-
-    //                 const hexSN = hex(vendorid);
-    //                 const snOnu = hexSN + modelid;
-
-    //                 onu.push({
-    //                     olt: olt.uid,
-    //                     pon: arrayInterfaces[0],
-    //                     index: parseInt(arrayInterfaces[1]),
-    //                     sn: snOnu,
-    //                 });
-
-
-    //             }
-
-    //             return onu;
-    //         };
-
-    //         const getName = async () => {
-    //             const onuName = await snmp.GponOnuMgmtName(data);
-    //             let onu = [];
-
-    //             for (let i = 0; i < onuName.length; i++) {
-    //                 const splitName = onuName[i].split('STRING:'); //array 0=id 2=name
-    //                 const splitInterfaces = splitName[0].split('=')[0]; //
-    //                 const replaceInterfaces = splitInterfaces.replace('SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.3.1.2.', '').trim();
-    //                 const arrayInterfaces = replaceInterfaces.split('.').filter(Boolean); //array 0=interfaces 1=Index Of onu
-
-    //                 onu.push({
-    //                     olt: olt.uid,
-    //                     pon: arrayInterfaces[0],
-    //                     index: parseInt(arrayInterfaces[1]),
-    //                     name: splitName[1].replace('\"', '').replace('\"', '').trim(),
-    //                 });
-
-    //             }
-
-    //             return onu;
-
-    //         };
-
-    //         const getDesc = async () => {
-    //             const onuName = await snmp.GponOnuMgmtDesc(data);
-    //             let onu = [];
-
-    //             for (let i = 0; i < onuName.length; i++) {
-    //                 const splitName = onuName[i].split('STRING:'); //array 0=id 2=name
-    //                 const splitInterfaces = splitName[0].split('=')[0]; //
-    //                 const replaceInterfaces = splitInterfaces.replace('SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.3.1.3.', '').trim();
-    //                 const arrayInterfaces = replaceInterfaces.split('.').filter(Boolean); //array 0=interfaces 1=Index Of onu
-
-    //                 onu.push({
-    //                     olt: olt.uid,
-    //                     pon: arrayInterfaces[0],
-    //                     index: parseInt(arrayInterfaces[1]),
-    //                     description: splitName[1].replace('\"', '').replace('\"', '').trim(),
-    //                 });
-
-    //             }
-
-    //             return onu;
-
-    //         };
-
-    //         const getPhaseStatus = async () => {
-    //             const onuName = await snmp.GponOnuPhaseStatus(data);
-
-    //             let onu = [];
-
-    //             for (let i = 0; i < onuName.length; i++) {
-    //                 const splitName = onuName[i].split('INTEGER:'); //array 0=id 2=name
-    //                 const splitInterfaces = splitName[0].split('=')[0]; //
-    //                 const replaceInterfaces = splitInterfaces.replace('SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.8.1.4.', '').trim();
-    //                 const arrayInterfaces = replaceInterfaces.split('.').filter(Boolean); //array 0=interfaces 1=Index Of onu
-    //                 const state = splitName[1].replace('\"', '').replace('\"', '').trim();
-
-    //                 //console.log(splitName)
-    //                 onu.push({
-    //                     olt: olt.uid,
-    //                     pon: arrayInterfaces[0],
-    //                     index: parseInt(arrayInterfaces[1]),
-    //                     status: parseInt(state),
-    //                 });
-
-    //             }
-
-    //             return onu;
-
-    //         };
-
-    //         const getGponPonRx = async () => {
-    //             const onuName = await snmp.GponRxOptLevel(data);
-    //             let onu = [];
-
-    //             for (let i = 0; i < onuName.length; i++) {
-    //                 const splitName = onuName[i].split('INTEGER:'); //array 0=id 2=name
-    //                 const splitInterfaces = splitName[0].split('=')[0]; //
-    //                 const replaceInterfaces = splitInterfaces.replace('SNMPv2-SMI::enterprises.3902.1082.500.1.2.4.2.1.2.', '').trim();
-    //                 const arrayInterfaces = replaceInterfaces.split('.').filter(Boolean); //array 0=interfaces 1=Index Of onu
-    //                 const state = splitName[1].replace('\"', '').replace('\"', '').trim() / 1000;
-    //                 const fixDecimal = state.toFixed(2)
-
-    //                 //console.log(splitName)
-    //                 onu.push({
-    //                     olt: olt.uid,
-    //                     pon: arrayInterfaces[0],
-    //                     index: parseInt(arrayInterfaces[1]),
-    //                     rx_olt: fixDecimal,
-    //                 });
-
-    //             }
-
-    //             return onu;
-
-    //         };
-
-    //         const getPonPonRx = async () => {
-    //             const onuName = await snmp.PonRxOpticalPower(data);
-    //             let onu = [];
-
-    //             for (let i = 0; i < onuName.length; i++) {
-    //                 const splitName = onuName[i].split('INTEGER:'); //array 0=id 2=name
-    //                 const splitInterfaces = splitName[0].split('=')[0]; //
-    //                 const replaceInterfaces = splitInterfaces.replace('SNMPv2-SMI::enterprises.3902.1082.500.20.2.2.2.1.10.', '').trim();
-    //                 const arrayInterfaces = replaceInterfaces.split('.').filter(Boolean); //array 0=interfaces 1=Index Of onu
-    //                 const state = splitName[1].replace('\"', '').replace('\"', '').trim() * 0.002 - 30
-    //                 const fixDecimal = state.toFixed(2)
-
-    //                 //console.log(splitName)
-    //                 onu.push({
-    //                     olt: olt.uid,
-    //                     pon: arrayInterfaces[0],
-    //                     index: parseInt(arrayInterfaces[1]),
-    //                     rx_onu: fixDecimal,
-    //                 });
-
-    //             }
-
-    //             return onu;
-
-    //         };
-
-    //         const getPonPonTx = async () => {
-    //             const onuName = await snmp.GponTxOptLevel(data);
-    //             let onu = [];
-
-    //             for (let i = 0; i < onuName.length; i++) {
-    //                 const splitName = onuName[i].split('INTEGER:'); //array 0=id 2=name
-    //                 const splitInterfaces = splitName[0].split('=')[0]; //
-    //                 const replaceInterfaces = splitInterfaces.replace('SNMPv2-SMI::enterprises.3902.1082.500.20.2.2.2.1.14.', '').trim();
-    //                 const arrayInterfaces = replaceInterfaces.split('.').filter(Boolean); //array 0=interfaces 1=Index Of onu
-    //                 const state = splitName[1].replace('\"', '').replace('\"', '').trim() * 0.002 - 30
-    //                 const fixDecimal = state.toFixed(2)
-
-    //                 //console.log(splitName)
-    //                 onu.push({
-    //                     olt: olt.uid,
-    //                     pon: arrayInterfaces[0],
-    //                     index: parseInt(arrayInterfaces[1]),
-    //                     tx_onu: fixDecimal,
-    //                 });
-
-    //             }
-
-    //             return onu;
-
-    //         };
-
-    //         const getPonDistance = async () => {
-    //             const onuName = await snmp.OnuDistance(data);
-    //             let onu = [];
-
-    //             for (let i = 0; i < onuName.length; i++) {
-    //                 const splitName = onuName[i].split('INTEGER:'); //array 0=id 2=name
-    //                 const splitInterfaces = splitName[0].split('=')[0]; //
-    //                 const replaceInterfaces = splitInterfaces.replace('SNMPv2-SMI::enterprises.3902.1012.3.11.4.1.2.', '').trim();
-    //                 const arrayInterfaces = replaceInterfaces.split('.').filter(Boolean); //array 0=interfaces 1=Index Of onu
-    //                 const state = splitName[1].replace('\"', '').replace('\"', '').trim()
-
-    //                 onu.push({
-    //                     olt: olt.uid,
-    //                     pon: arrayInterfaces[0],
-    //                     index: parseInt(arrayInterfaces[1]),
-    //                     distance: parseInt(state)
-    //                 });
-
-    //             }
-
-    //             return onu;
-
-    //         };
-
-
-
-    //          const [sn, name, descr, state, oltRx, onuRx, onuTx, distance] = await Promise.all([getSn(), getName(), getDesc(), getPhaseStatus(), getGponPonRx(), getPonPonRx(), getPonPonTx(), getPonDistance()]);
-
-    //         const snIndex = sn.map((item) => item.sn);
-    //         const nameIndex = name.map((item) => item);
-    //         const descrIndex = descr.map((item) => item);
-    //         const stateIndex = state.map((item) => item);
-    //         const oltRxIndex = oltRx.map((item) => item);
-    //         const onuRxIndex = onuRx.map((item) => item);
-    //         const onuTxIndex = onuTx.map((item) => item);
-    //         const distanceIndex = distance.map((item) => item);
-
-    //         const onu = snIndex.map((item, index) => {
-    //             return {
-    //                 user: req.user,
-    //                 uid: uuidv4(),
-    //                 olt: olt.uid,
-    //                 pon: nameIndex[index].pon,
-    //                 index: nameIndex[index].index,
-    //                 sn: item,
-    //                 name: nameIndex[index].name,
-    //                 description: descrIndex[index].description,
-    //                 state: stateIndex[index].status,
-    //                 olt_rx: oltRxIndex[index].rx_olt,
-    //                 onu_rx: onuRxIndex[index].rx_onu,
-    //                 onu_tx: onuTxIndex[index].tx_onu,
-    //                 distance: distanceIndex[index].distance,
-    //                 created_at: moment().unix(),
-    //                 updated_at: moment().unix()
-
-    //             }
-    //         });
-
-    //         onu.forEach(async (element) => {
-
-    //             const duplicate = await client.db(process.env.MONGO_DB).collection('Snmp.Onu').findOne({ user: req.user, olt: olt.uid, index: element.index, pon: element.pon });
-
-    //             if (duplicate) {
-
-    //                 const data = {
-    //                     sn: element.sn,
-    //                     name: element.name,
-    //                     description: element.description,
-    //                     state: element.state,
-    //                     olt_rx: element.olt_rx,
-    //                     onu_rx: element.onu_rx,
-    //                     onu_tx: element.onu_tx,
-    //                     distance: element.distance,
-    //                     updated_at: moment().unix()
-    //                 }
-
-    //                 const update = await client.db(process.env.MONGO_DB).collection('Snmp.Onu').updateOne({ user: req.user, olt: olt.uid, index: element.index, pon: element.pon }, { $set: data });
-    //                 if (update) {
-    //                    const compareDuplicateWithData = duplicate.sn == data.sn && duplicate.name == data.name && duplicate.description == data.description && duplicate.state == data.state && duplicate.olt_rx == data.olt_rx && duplicate.onu_rx == data.onu_rx && duplicate.onu_tx == data.onu_tx && duplicate.distance == data.distance;
-    //                     if (compareDuplicateWithData) {
-    //                         return console.log(`Onu ${element.sn} not updated`)
-    //                     } else {
-    //                         return console.log(`Onu ${element.sn} updated`)
-    //                     }
-
-    //                    // return console.log(data.onu_rx)
-    //                 }
-    //             } else {
-    //                 const insert = await client.db(process.env.MONGO_DB).collection('Snmp.Onu').insertOne(element);
-    //                 if (insert) {
-    //                     return console.log(insert)
-    //                 }
-    //             }
-    //         });
-
-    //     }
-    //     catch (error) {
-    //         console.log(error)
-    //         return next(
-    //             createError(error.status, error.message));
-    //     }
-    // });//get all onu info
-
-
     app.get('/snmp/:id/onu', async (req, res, next) => {
         try {
 
@@ -777,8 +472,20 @@ export const snmpRoute = (app, client) => {
 
                             const compareDuplicateWithData = duplicate.sn == dataUpdate.sn && duplicate.name == dataUpdate.name && duplicate.description == dataUpdate.description && duplicate.distance == dataUpdate.distance && duplicate.state == dataUpdate.state && duplicate.rx_olt == dataUpdate.rx_olt && duplicate.rx_onu == dataUpdate.rx_onu && duplicate.tx_onu == dataUpdate.tx_onu && duplicate.model == dataUpdate.model && duplicate.firmware == dataUpdate.firmware;
 
-                            if (compareDuplicateWithData) {
+                            if (duplicate.sn == dataUpdate.sn &&
+                                duplicate.name == dataUpdate.name &&
+                                duplicate.description == dataUpdate.description &&
+                                duplicate.distance == dataUpdate.distance &&
+                                duplicate.state == dataUpdate.state &&
+                                duplicate.rx_olt == dataUpdate.rx_olt &&
+                                duplicate.rx_onu == dataUpdate.rx_onu &&
+                                duplicate.tx_onu == dataUpdate.tx_onu &&
+                                duplicate.model == dataUpdate.model &&
+                                duplicate.firmware == dataUpdate.firmware
+                            ) {
                                 return console.log(`Onu ${duplicate.interface} => ${element.sn} not updated`)
+
+
                             } else {
                                 const update = await client.db(process.env.MONGO_DB).collection('OLT.Onu').updateOne({ user: req.user, olt: req.params.id, pon: datasave.pon, index: datasave.index }, { $set: dataUpdate });
                                 if (update) {
@@ -788,20 +495,14 @@ export const snmpRoute = (app, client) => {
                                 }
                             }
 
-                            // const update = await client.db(process.env.MONGO_DB).collection('OLT.Onu').updateOne({ user: req.user, olt: req.params.id, pon: ifIndex[i].ifindex, index: element.index }, { $set: dataUpdate });
-                            // if (update) {
-                            //     return console.log(`Onu  ${duplicate.interface} => ${element.sn} updated`)
-                            // } else {
-                            //     return console.log(`Onu ${duplicate.sn} not updated`)
-                            // }
-                        }
-
-                        const create = await client.db(process.env.MONGO_DB).collection('OLT.Onu').insertOne(datasave);
-                        if (create) {
-                            return console.log(`Onu ${datasave.interface}, ${element.sn} registered`)
-
                         } else {
-                            return console.log(`Onu ${datasave.sn} not register`)
+                            const create = await client.db(process.env.MONGO_DB).collection('OLT.Onu').insertOne(datasave);
+                            if (create) {
+                                return console.log(`Onu ${datasave.interface}, ${element.sn} registered`)
+
+                            } else {
+                                return console.log(`Onu ${datasave.sn} not register`)
+                            }
                         }
                     });
                 }
@@ -1394,8 +1095,8 @@ export const snmpRoute = (app, client) => {
                     const duplicate = await client.db(process.env.MONGO_DB).collection('OLT.Onu').findOne({ user: req.user, olt: req.params.id, pon: element.pon, index: element.index });
 
                     if (duplicate) {
-                       const compare = duplicate.pon == element.pon && duplicate.index == element.index && duplicate.state == element.state;
-                        if(compare == false){
+                        const compare = duplicate.pon == element.pon && duplicate.index == element.index && duplicate.state == element.state;
+                        if (compare == false) {
                             return console.log(`Onu ${duplicate.sn} state:${duplicate.state} => state:${element.state}`)
                         }
                     }

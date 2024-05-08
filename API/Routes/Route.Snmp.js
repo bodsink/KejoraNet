@@ -774,12 +774,26 @@ export const snmpRoute = (app, client) => {
                                 firmware: element.firmware,
                                 updated_at: moment().unix()
                             }
-                            const update = await client.db(process.env.MONGO_DB).collection('OLT.Onu').updateOne({ user: req.user, olt: req.params.id, pon: ifIndex[i].ifindex, index: element.index }, { $set: dataUpdate });
-                            if (update) {
-                                return console.log(`Onu  ${duplicate.interface} => ${element.sn} updated`)
+
+                            const compareDuplicateWithData = duplicate.sn == dataUpdate.sn && duplicate.name == dataUpdate.name && duplicate.description == dataUpdate.description && duplicate.distance == dataUpdate.distance && duplicate.state == dataUpdate.state && duplicate.rx_olt == dataUpdate.rx_olt && duplicate.rx_onu == dataUpdate.rx_onu && duplicate.tx_onu == dataUpdate.tx_onu && duplicate.model == dataUpdate.model && duplicate.firmware == dataUpdate.firmware;
+
+                            if (compareDuplicateWithData) {
+                                return console.log(`Onu ${duplicate.interface} => ${element.sn} not updated`)
                             } else {
-                                return console.log(`Onu ${duplicate.sn} not updated`)
+                                const update = await client.db(process.env.MONGO_DB).collection('OLT.Onu').updateOne({ user: req.user, olt: req.params.id, pon: datasave.pon, index: datasave.index }, { $set: dataUpdate });
+                                if (update) {
+                                    return console.log(`Onu  ${duplicate.interface} => ${element.sn} updated`)
+                                } else {
+                                    return console.log(`Onu ${duplicate.sn} not updated`)
+                                }
                             }
+
+                            // const update = await client.db(process.env.MONGO_DB).collection('OLT.Onu').updateOne({ user: req.user, olt: req.params.id, pon: ifIndex[i].ifindex, index: element.index }, { $set: dataUpdate });
+                            // if (update) {
+                            //     return console.log(`Onu  ${duplicate.interface} => ${element.sn} updated`)
+                            // } else {
+                            //     return console.log(`Onu ${duplicate.sn} not updated`)
+                            // }
                         }
 
                         const create = await client.db(process.env.MONGO_DB).collection('OLT.Onu').insertOne(datasave);

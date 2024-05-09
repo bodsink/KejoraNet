@@ -68,8 +68,6 @@ export const OltRoute = (app, client) => {
                 ip: olt.ip
             }
 
-            
-
             const updateSys = async () => {
                 const cekSys = await snmp.SystemInformation(dataCek);
             
@@ -87,7 +85,9 @@ export const OltRoute = (app, client) => {
                 console.log(`Update Sys ${olt.uid} ${dataUpdate.sysUpTimeInstance}`);
             };
 
-            await updateSys();
+              await updateSys();
+
+            
 
 
             const node = await client.db(process.env.MONGO_DB).collection('Node').findOne({ user: req.user, uid: olt.node });

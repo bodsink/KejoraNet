@@ -73,7 +73,7 @@ export const OltRoute = (app, client) => {
             
               //  const findSys = await client.db(process.env.MONGO_DB).collection('Devices.Sys').findOne({ user: req.user, device: olt.uid });
                 const dataUpdate = {
-                    sysUpTimeInstance: cekSys[0].sysUpTimeInstance,
+                    sysUpTime: cekSys[0].sysUpTimeInstance,
                     sysName: cekSys[0].sysName,
                     sysDescr: cekSys[0].sysDescr,
                     sysContact: cekSys[0].sysContact,
@@ -82,7 +82,8 @@ export const OltRoute = (app, client) => {
                 }
 
                 const update = await client.db(process.env.MONGO_DB).collection('Devices.Sys').updateOne({ user: req.user, device: olt.uid }, { $set: dataUpdate });
-                console.log(`Update Sys ${olt.uid} ${dataUpdate.sysUpTimeInstance}`);
+                console.log(update)
+                // console.log(`Update Sys ${olt.uid} ${dataUpdate.sysUpTimeInstance}`);
             };
 
               await updateSys();

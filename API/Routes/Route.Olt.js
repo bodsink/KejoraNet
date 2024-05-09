@@ -12,11 +12,7 @@ export const OltRoute = (app, client) => {
         try {
             const olt = await client.db(process.env.MONGO_DB).collection('Devices').find({ user: req.user, type: 'OLT' }).toArray();
 
-            if(olt.length === 0){
-                throw createError(404, 'OLT not found');
-            }
-
-           
+          
             let dataOlt = [];
 
             for (let i = 0; i < olt.length; i++) {
@@ -40,9 +36,6 @@ export const OltRoute = (app, client) => {
                     onu
                     
                 })
-
-              //  console.log(dataOlt)
-              //  return dataOlt;
               
             }
            
@@ -57,7 +50,7 @@ export const OltRoute = (app, client) => {
         catch (err) {
             console.log(err)
             return next(
-                createError(401, err.message));
+                createError(err.status, err.message));
         }
     });
 
@@ -80,7 +73,7 @@ export const OltRoute = (app, client) => {
             const updateSys = async () => {
                 const cekSys = await snmp.SystemInformation(dataCek);
             
-                const findSys = await client.db(process.env.MONGO_DB).collection('Devices.Sys').findOne({ user: req.user, device: olt.uid });
+              //  const findSys = await client.db(process.env.MONGO_DB).collection('Devices.Sys').findOne({ user: req.user, device: olt.uid });
                 const dataUpdate = {
                     sysUpTimeInstance: cekSys[0].sysUpTimeInstance,
                     sysName: cekSys[0].sysName,
@@ -91,7 +84,7 @@ export const OltRoute = (app, client) => {
                 }
 
                 const update = await client.db(process.env.MONGO_DB).collection('Devices.Sys').updateOne({ user: req.user, device: olt.uid }, { $set: dataUpdate });
-                console.log(`Update Sys ${olt.uid} ${update.modifiedCount}`);
+                console.log(`Update Sys ${olt.uid} ${update.sysUpTimeInstance}`);
             };
 
             await updateSys();
@@ -120,8 +113,6 @@ export const OltRoute = (app, client) => {
                   iftype: 'ethernetCsmacd(6)',
                   ifname: {$not :{$regex: 'Mng1'}}
                  }).sort({ifindex: 1}).toArray();
-
-
 
 
             const cards = await client.db(process.env.MONGO_DB).collection('OLT.Cards').find({ user: req.user, olt: olt.uid}).sort({slot: 1}).toArray();

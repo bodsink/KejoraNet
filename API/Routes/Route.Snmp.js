@@ -426,10 +426,10 @@ export const snmpRoute = (app, client) => {
                 } else {
 
                     walk.forEach(async (element) => {
-                        const findState = element.state == '5';
-                        if (findState == true) {
-                            return console.log(`Onu ${element.sn} => PowerOff`) //buat notif 
-                        }
+                        // const findState = element.state == '5';
+                        // if (findState == true) {
+                        //     return console.log(`Onu ${element.sn} => PowerOff`) //buat notif 
+                        // }
 
                         const datasave = {
                             user: req.user,
@@ -455,6 +455,7 @@ export const snmpRoute = (app, client) => {
 
 
                         const duplicate = await client.db(process.env.MONGO_DB).collection('OLT.Onu').findOne({ user: req.user, olt: req.params.id, pon: datasave.pon, index: datasave.index });
+                       
                         if (duplicate) {
                             const dataUpdate = {
                                 sn: element.sn,
@@ -470,8 +471,7 @@ export const snmpRoute = (app, client) => {
                                 updated_at: moment().unix()
                             }
 
-                            const compareDuplicateWithData = duplicate.sn == dataUpdate.sn && duplicate.name == dataUpdate.name && duplicate.description == dataUpdate.description && duplicate.distance == dataUpdate.distance && duplicate.state == dataUpdate.state && duplicate.rx_olt == dataUpdate.rx_olt && duplicate.rx_onu == dataUpdate.rx_onu && duplicate.tx_onu == dataUpdate.tx_onu && duplicate.model == dataUpdate.model && duplicate.firmware == dataUpdate.firmware;
-
+                           
                             if (duplicate.sn == dataUpdate.sn &&
                                 duplicate.name == dataUpdate.name &&
                                 duplicate.description == dataUpdate.description &&
@@ -485,7 +485,6 @@ export const snmpRoute = (app, client) => {
                             ) {
                                 return console.log(`Onu ${duplicate.interface} => ${element.sn} not updated`)
 
-
                             } else {
                                 const update = await client.db(process.env.MONGO_DB).collection('OLT.Onu').updateOne({ user: req.user, olt: req.params.id, pon: datasave.pon, index: datasave.index }, { $set: dataUpdate });
                                 if (update) {
@@ -496,6 +495,7 @@ export const snmpRoute = (app, client) => {
                             }
 
                         } else {
+
                             const create = await client.db(process.env.MONGO_DB).collection('OLT.Onu').insertOne(datasave);
                             if (create) {
                                 return console.log(`Onu ${datasave.interface}, ${element.sn} registered`)

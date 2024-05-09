@@ -84,7 +84,7 @@ export const OltRoute = (app, client) => {
                 }
 
                 const update = await client.db(process.env.MONGO_DB).collection('Devices.Sys').updateOne({ user: req.user, device: olt.uid }, { $set: dataUpdate });
-                console.log(`Update Sys ${olt.uid} ${update.sysUpTimeInstance}`);
+                console.log(`Update Sys ${olt.uid} ${dataUpdate.sysUpTimeInstance}`);
             };
 
             await updateSys();

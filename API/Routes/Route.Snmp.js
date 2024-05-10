@@ -338,6 +338,10 @@ export const snmpRoute = (app, client) => {
                             duplicate.model == dataUpdate.model &&
                             duplicate.firmware == dataUpdate.firmware
                         ) {
+                           console.log(`Onu ${duplicate.interface} => ${walk[j].sn} tidak ada perubahan`)
+
+
+                        } else {
                             const update = await client.db(process.env.MONGO_DB).collection('Onu').updateOne({
                                 user: req.user,
                                 olt: olt,
@@ -351,10 +355,6 @@ export const snmpRoute = (app, client) => {
                             } else {
                                 console.log(`Onu ${duplicate.sn} not updated`)
                             }
-
-
-                        } else {
-
 
                         }
 
@@ -540,7 +540,6 @@ export const snmpRoute = (app, client) => {
     });//get all optical info
 
 
-
     app.post('/snmp/olt/cards', async (req, res, next) => {
         try {
 
@@ -720,68 +719,43 @@ export const snmpRoute = (app, client) => {
         }
     });
 
-    app.get('/snmp/:id/onulos', async (req, res, next) => {
+    app.post('/snmp/onu/los', async (req, res, next) => {
         try {
 
-            const ifIndex = await client.db(process.env.MONGO_DB).collection('Devices.IfIndex').aggregate([
+            const { id } = req.body;
+
+            const olt = await client.db(process.env.MONGO_DB).collection('Devices').findOne({ user: req.user, uid: id });
+
+            const onu = await client.db(process.env.MONGO_DB).collection('Onu').aggregate([
                 {
                     $match: {
                         user: req.user,
-                        device: req.params.id,
-                        iftype: 'gpon(250)',
-                        ifoperstatus: 'up(1)'
+                        olt:id
                     }
                 }, {
                     $lookup: {
-                        from: 'Devices',
-                        localField: 'device',
-                        foreignField: 'uid',
-                        as: 'olt'
+                        from: 'IfIndex',
+                        localField: 'pon',
+                        foreignField: 'ifindex',
+                        as: 'pon'
                     }
                 }, {
-                    $unwind: '$olt'
-                }, {
-                    $project: {
-                        snmp: '$olt.snmp',
-                        ip: '$olt.ip',
-                        snmp_port: '$olt.snmp_port',
-                        ifindex: '$ifindex',
-                        index: '$index',
-                        interfaces: '$interfaces',
-                        alias: '$ifalias'
-                    }
+                    $unwind: '$pon'
                 }
             ]).sort({ ifindex: 1 }).toArray();
 
-            if (ifIndex.length == 0) {
-                throw createError(404, 'No pon interfaces found')
-            }
-
-            for (let i = 0; i < ifIndex.length; i++) {
+            for (let i = 0; i < onu.length; i++) {
                 const data = {
-                    snmp: ifIndex[i].snmp,
-                    ip: ifIndex[i].ip,
-                    snmp_port: ifIndex[i].snmp_port,
-                    int_olt: ifIndex[i].ifindex
+                    snmp: olt.snmp,
+                    ip: olt.ip,
+                    snmp_port: olt.snmp_port,
+                    onu: `${onu[i].pon.ifindex}.${onu[i].index}`
                 }
 
-
-
-                const walk = await snmpLib.onuState(data);
-                walk.forEach(async (element) => {
-                    //console.log(element)
-
-                    const duplicate = await client.db(process.env.MONGO_DB).collection('OLT.Onu').findOne({ user: req.user, olt: req.params.id, pon: element.pon, index: element.index });
-
-                    if (duplicate) {
-                        const compare = duplicate.pon == element.pon && duplicate.index == element.index && duplicate.state == element.state;
-                        if (compare == false) {
-                            return console.log(`Onu ${duplicate.sn} state:${duplicate.state} => state:${element.state}`)
-                        }
-                    }
-
-
-                });
+              
+               const walk = await snmpLib.onuState(data);
+               console.log(walk)
+                
 
 
             }

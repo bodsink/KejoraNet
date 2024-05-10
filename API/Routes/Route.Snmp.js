@@ -279,35 +279,12 @@ export const snmpRoute = (app, client) => {
                 }
 
                 for (let j = 0; j < walk.length; j++) {
-                    const datasave = {
-                        user: req.user,
-                        uid: uuidv4(),
-                        olt: olt,
-                        pon: walk[j].pon,
-                        index: walk[j].index,
-                        interface: `${ifIndex[i].alias}:${walk[j].index}`,
-                        sn: walk[j].sn,
-                        name: walk[j].name,
-                        description: walk[j].description,
-                        distance: walk[j].distance,
-                        state: walk[j].state,
-                        model: walk[j].model,
-                        firmware: walk[j].firmware,
-                        rx_olt: walk[j].rx_olt,
-                        rx_onu: walk[j].rx_onu,
-                        tx_onu: walk[j].tx_onu,
-                        tcont: walk[j].tcont,
-                        gemport: walk[j].gemport,
-                        created_at: moment().unix(),
-                    };
-
-
 
                     const duplicate = await client.db(process.env.MONGO_DB).collection('Onu').findOne({
                         user: req.user,
                         olt: olt,
-                        pon: datasave.pon,
-                        index: datasave.index
+                        pon: walk[j].pon,
+                        index: walk[j].index
                     });
 
 
@@ -359,6 +336,28 @@ export const snmpRoute = (app, client) => {
                         }
 
                     } else {
+                        const datasave = {
+                            user: req.user,
+                            uid: uuidv4(),
+                            olt: olt,
+                            pon: walk[j].pon,
+                            index: walk[j].index,
+                            interface: `${ifIndex[i].alias}:${walk[j].index}`,
+                            sn: walk[j].sn,
+                            name: walk[j].name,
+                            description: walk[j].description,
+                            distance: walk[j].distance,
+                            state: walk[j].state,
+                            model: walk[j].model,
+                            firmware: walk[j].firmware,
+                            rx_olt: walk[j].rx_olt,
+                            rx_onu: walk[j].rx_onu,
+                            tx_onu: walk[j].tx_onu,
+                            tcont: walk[j].tcont,
+                            gemport: walk[j].gemport,
+                            created_at: moment().unix(),
+                        };
+                        
                         const save = await client.db(process.env.MONGO_DB).collection('Onu').insertOne(datasave);
                         if (save) {
                             console.log(`Onu found sn:${walk[j].sn}=>${datasave.interface}, success registered`);

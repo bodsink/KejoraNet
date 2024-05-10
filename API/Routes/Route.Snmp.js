@@ -362,7 +362,7 @@ export const snmpRoute = (app, client) => {
                         const save = await client.db(process.env.MONGO_DB).collection('Onu').insertOne(datasave);
                         if (save) {
                             console.log(`Onu found sn:${walk[j].sn}=>${datasave.interface}, success registered`);
-                           // onu.push(datasave)
+                            // onu.push(datasave)
                         } else {
                             console.log(`Onu ${datasave.sn} failed register`)
                         }
@@ -681,7 +681,7 @@ export const snmpRoute = (app, client) => {
 
                     if (update && update.modifiedCount > 0) {
                         console.log(`Vlan ${vlan[i].id} ${vlan[i].name} updated`)
-                       // vlans.push(dataUpdate)
+                        vlans.push(dataUpdate)
                     } else {
                         console.log(`Vlan ${vlan[i].id} ${vlan[i].name} not updated`)
                     }
@@ -701,7 +701,7 @@ export const snmpRoute = (app, client) => {
 
                     if (result) {
                         console.log(`Vlan ${vlan[i].id} ${vlan[i].name} telah di simpan`)
-                       // vlans.push(dataSave)
+                        vlans.push(dataSave)
                     } else {
                         console.log(`Vlan ${vlan[i].id} ${vlan[i].name} gagal di simpan`)
                     }
@@ -797,41 +797,41 @@ export const snmpRoute = (app, client) => {
     app.post('/snmp/onu/uncfg', async (req, res, next) => {
         try {
 
-            const {id} = req.body;
-            if(!id){
+            const { id } = req.body;
+            if (!id) {
                 throw createError(404, 'Device id harus di isi');
             }
 
-            const olt = await client.db(process.env.MONGO_DB).collection('Devices').findOne({user:req.user, uid:id});
+            const olt = await client.db(process.env.MONGO_DB).collection('Devices').findOne({ user: req.user, uid: id });
 
-            if(!olt){
+            if (!olt) {
                 throw createError(404, 'OLT not found');
             }
 
             const data = {
-                snmp:olt.snmp,
-                ip:olt.ip,
-                snmp_port:olt.snmp_port
+                snmp: olt.snmp,
+                ip: olt.ip,
+                snmp_port: olt.snmp_port
             }
 
             const uncfg = await snmpLib.unconfiguredOnu(data);
-            
+
             let onu = [];
 
             for (let i = 0; i < uncfg.length; i++) {
-               const cekPon = await client.db(process.env.MONGO_DB).collection('IfIndex').findOne({user:req.user, device:id, ifindex:uncfg[i].pon});
-               onu.push({
-                     pon:cekPon.ifalias,
-                     index:uncfg[i].index,
-                     sn:uncfg[i].sn,
-                     date: moment().unix(),
-                
-               })
+                const cekPon = await client.db(process.env.MONGO_DB).collection('IfIndex').findOne({ user: req.user, device: id, ifindex: uncfg[i].pon });
+                onu.push({
+                    pon: cekPon.ifalias,
+                    index: uncfg[i].index,
+                    sn: uncfg[i].sn,
+                    date: moment().unix(),
+
+                })
             }
 
             return res.status(200).send({
-                count:onu.length,
-                data:onu
+                count: onu.length,
+                data: onu
             })
 
         }

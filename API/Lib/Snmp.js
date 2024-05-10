@@ -1771,7 +1771,7 @@ export default class libSnmp {
             let vlan = [];
 
             const VlanList = async () => {
-                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} 1.3.6.1.4.1.3902.1082.40.50.2.1.2.1.2${id.vlan}`);
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.40.50.2.1.2.1.2${id.vlan}`);
                 if (stderr) throw new Error(stderr);
 
                 const vlanName = stdout.split('\n').filter(Boolean);

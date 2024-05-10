@@ -287,8 +287,7 @@ export const snmpRoute = (app, client) => {
                         index: walk[j].index
                     });
 
-
-
+                  
                     if (duplicate) {
                         const dataUpdate = {
                             sn: walk[j].sn,
@@ -322,8 +321,8 @@ export const snmpRoute = (app, client) => {
                             const update = await client.db(process.env.MONGO_DB).collection('Onu').updateOne({
                                 user: req.user,
                                 olt: olt,
-                                pon: datasave.pon,
-                                index: datasave.index
+                                pon: walk[j].pon,
+                                index: walk[j].index
                             }, { $set: dataUpdate });
 
                             if (update && update.modifiedCount > 0) {
@@ -357,7 +356,7 @@ export const snmpRoute = (app, client) => {
                             gemport: walk[j].gemport,
                             created_at: moment().unix(),
                         };
-                        
+
                         const save = await client.db(process.env.MONGO_DB).collection('Onu').insertOne(datasave);
                         if (save) {
                             console.log(`Onu found sn:${walk[j].sn}=>${datasave.interface}, success registered`);
@@ -379,6 +378,7 @@ export const snmpRoute = (app, client) => {
             }
         }
         catch (error) {
+            console.log(error)
             return next(
                 createError(408, error));
         }

@@ -347,7 +347,7 @@ export const snmpRoute = (app, client) => {
 
                             if (update && update.modifiedCount > 0) {
                                 console.log(`Onu ${duplicate.interface} => ${walk[j].sn} updated`)
-                                onu.push(dataUpdate)
+                                //onu.push(dataUpdate)
                             } else {
                                 console.log(`Onu ${duplicate.sn} not updated`)
                             }
@@ -362,7 +362,7 @@ export const snmpRoute = (app, client) => {
                         const save = await client.db(process.env.MONGO_DB).collection('Onu').insertOne(datasave);
                         if (save) {
                             console.log(`Onu found sn:${walk[j].sn}=>${datasave.interface}, success registered`);
-                            onu.push(datasave)
+                           // onu.push(datasave)
                         } else {
                             console.log(`Onu ${datasave.sn} failed register`)
                         }
@@ -371,10 +371,10 @@ export const snmpRoute = (app, client) => {
 
                 }
 
-                return res.status(200).send({
-                    count: onu.length,
-                    data: onu
-                });
+                // return res.status(200).send({
+                //     count: onu.length,
+                //     data: onu
+                // });
 
 
             }

@@ -115,10 +115,7 @@ export const OnuRoute = (app, client) => {
 
     app.get('/onu/:id', async (req, res, next) => {
         try {
-
-
-
-            const onu = await client.db(process.env.MONGO_DB).collection('OLT.Onu').aggregate([
+            const onu = await client.db(process.env.MONGO_DB).collection('Onu').aggregate([
                 {
                     $match: {
                         user: req.user,
@@ -136,7 +133,7 @@ export const OnuRoute = (app, client) => {
                     $unwind: '$olt',
                 }, {
                     $lookup: {
-                        from: 'Devices.Sys',
+                        from: 'IfSys',
                         localField: 'olt.uid',
                         foreignField: 'device',
                         as: 'olt.sys'
@@ -146,9 +143,9 @@ export const OnuRoute = (app, client) => {
                 }
             ]).toArray();
 
-    
+
             if (onu.length == 0) {
-                throw createError(404, 'Onu not found');
+                throw createError(400, 'Onu not found');
             }
 
             const data = {
@@ -185,18 +182,16 @@ export const OnuRoute = (app, client) => {
 
             }
 
-            const update = await client.db(process.env.MONGO_DB).collection('OLT.Onu').updateOne({ user: req.user, uid: req.params.id }, { $set: dataUpdata });
+            const update = await client.db(process.env.MONGO_DB).collection('Onu').updateOne({ user: req.user, uid: req.params.id }, { $set: dataUpdata });
 
 
-            const getUpdate = await client.db(process.env.MONGO_DB).collection('OLT.Onu').findOne({ user: req.user, uid: req.params.id });
+            const getUpdate = await client.db(process.env.MONGO_DB).collection('Onu').findOne({ user: req.user, uid: req.params.id });
 
             const setting = await client.db(process.env.MONGO_DB).collection('Settings').findOne({ user: req.user });
 
 
             const dataAcs = {
-                url: setting.acs.url,
-                client: setting.acs.CF_Access_Client_Id,
-                secret: setting.acs.CF_Access_Client_Secret,
+
                 sn: onu[0].sn
             }
 
@@ -205,34 +200,20 @@ export const OnuRoute = (app, client) => {
             let wifi = [];
 
             if (onu[0].model == 'HG6145D2' || onu[0].model == 'HG6145F' || onu[0].model == 'F660') {
-                const getAcsSN = await acs.getOnu(dataAcs);
 
-                const dataSummon = {
+                const dataAcs = {
                     url: setting.acs.url,
                     client: setting.acs.CF_Access_Client_Id,
                     secret: setting.acs.CF_Access_Client_Secret,
-                    onu: getAcsSN[0]._id,
-                    data: {
-                        "name": "refreshObject",
-                        "objectName": ""
-                    }
+                    sn: onu[0].sn
                 }
 
-                // const summon = await acs.Summon(dataSummon);
-
-                // setTimeout(() => {
-                //     console.log(summon)
-                // }, 1000);
 
 
+                const getAcsSN = await acs.getOnu(dataAcs);
 
-                const getAcs = await acs.getOnu(dataAcs);
 
-                acsResppnse = getAcs;
-
-               // console.log(getAcs[0].InternetGatewayDevice.LANDevice['1'].WLANConfiguration['1'].SSID)
-
-               const totalSecs = getAcs[0].InternetGatewayDevice.DeviceInfo.UpTime._value
+                const totalSecs = getAcsSN[0].InternetGatewayDevice.DeviceInfo.UpTime._value
 
                 let days = Math.floor(totalSecs / 86400);
                 let rem = totalSecs % 86400;
@@ -254,26 +235,26 @@ export const OnuRoute = (app, client) => {
                 let uptime = days + "d " + hrs + ":" + mins + ":" + secs;
 
 
-                if (getAcs.length == 0) {
+                if (getAcsSN.length == 0) {
                     bras = null;
                 } else {
                     for (let i = 1; i <= 3; i++) {
 
-                        if (getAcs[0].InternetGatewayDevice.WANDevice['1'].WANConnectionDevice[i]) {
-                           
-                            if (getAcs[0].InternetGatewayDevice.WANDevice['1'].WANConnectionDevice[i].WANPPPConnection['1']) {
+                        if (getAcsSN[0].InternetGatewayDevice.WANDevice['1'].WANConnectionDevice[i]) {
+
+                            if (getAcsSN[0].InternetGatewayDevice.WANDevice['1'].WANConnectionDevice[i].WANPPPConnection['1']) {
                                 bras.push({
                                     id: i,
-                                    user: getAcs[0].InternetGatewayDevice.WANDevice['1'].WANConnectionDevice[i].WANPPPConnection['1'].Username,
-                                    vlan: getAcs[0].InternetGatewayDevice.WANDevice['1'].WANConnectionDevice[i].WANPPPConnection['1'].VLANID,
-                                    ip: getAcs[0].InternetGatewayDevice.WANDevice['1'].WANConnectionDevice[i].WANPPPConnection['1'].ExternalIPAddress,
+                                    user: getAcsSN[0].InternetGatewayDevice.WANDevice['1'].WANConnectionDevice[i].WANPPPConnection['1'].Username,
+                                    vlan: getAcsSN[0].InternetGatewayDevice.WANDevice['1'].WANConnectionDevice[i].WANPPPConnection['1'].VLANID,
+                                    ip: getAcsSN[0].InternetGatewayDevice.WANDevice['1'].WANConnectionDevice[i].WANPPPConnection['1'].ExternalIPAddress,
                                     uptime: uptime
                                 })
 
                                 wifi.push({
-                                    ssid: acsResppnse[0].InternetGatewayDevice.LANDevice['1'].WLANConfiguration['1'].SSID,
-                                    users: acsResppnse[0].InternetGatewayDevice.LANDevice['1'].WLANConfiguration['1'].WLAN_AssociatedDeviceNumberOfEntries
-                                
+                                    ssid: getAcsSN[0].InternetGatewayDevice.LANDevice['1'].WLANConfiguration['1'].SSID,
+                                    users: getAcsSN[0].InternetGatewayDevice.LANDevice['1'].WLANConfiguration['1'].WLAN_AssociatedDeviceNumberOfEntries
+
                                 })
 
                             }
@@ -281,24 +262,24 @@ export const OnuRoute = (app, client) => {
                     }
                 }
 
-               
+
             } else {
                 bras = [];
-                wifi= [];
+                wifi = [];
             }
 
             res.status(200).send({
                 data: getUpdate,
                 olt: onu[0].olt,
                 bras: bras,
-                wlan:wifi
+                wlan: wifi
             });
 
         }
         catch (error) {
             console.log(error)
             return next(
-                createError(400, 'Onu not found'));
+                createError(404, 'Onu not found'));
         }
     });//Get Onu by ID
 
@@ -392,14 +373,13 @@ export const OnuRoute = (app, client) => {
                 onu: `${onu.pon}.${onu.index}`
             }
 
-            if(!req.body.reason){
+            if (!req.body.reason) {
                 throw createError(400, 'Please enter reason why you want to reboot onu?');
             }
 
-           const reboot = await snmp.RebootOnu(data);
-           console.log(reboot)
+            const reboot = await snmp.RebootOnu(data);
 
-           if(reboot){
+            if (reboot) {
                 const dataHistory = {
                     user: req.user,
                     onu: onu.uid,
@@ -410,23 +390,24 @@ export const OnuRoute = (app, client) => {
                 await client.db(process.env.MONGO_DB).collection('OnuLogs').insertOne(dataHistory);
 
                 return res.status(200).send({
-                     status: 200,
-                     message: 'Onu has been rebooted, please wait for a few moments'
+                    status: 200,
+                    message: 'Onu has been rebooted, please wait for a few moments'
                 });
-           } else {
+            } else {
                 throw createError(500, 'Failed to reboot onu');
-              
-           }
 
-            
-            
+            }
+
+
+
         }
         catch (error) {
             console.log(error)
             return next(
-                createError(error.status, error.message));
+                createError(400, error.message));
         }
     });//reboot onu
+
 
 };
 

@@ -137,6 +137,127 @@ export default class libSnmp {
         }
     };//get system device
 
+    async cekOnu(id) {
+        try {
+
+            if (id.pon === undefined) {
+                id.pon = '';
+            } else {
+                id.pon = `.${id.pon}`
+            }
+
+
+            const scanSN = async () => {
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.3.1.18${id.pon}`);
+                if (stderr) throw new Error(stderr);
+
+                const onuName = stdout.split('\n').filter(Boolean);
+
+                let onu = [];
+
+                for (let i = 0; i < onuName.length; i++) {
+                    const splitName = onuName[i].replace('SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.3.1.18.', '').replace('=', '').replace('STRING:', '').trim().replace('"1,', '').replace(' ', '.').replace(/\s/g, '').trim().split('.').filter(Boolean);
+
+
+                    onu.push({
+                        pon: parseInt(splitName[0]),
+                        index: parseInt(splitName[1]),
+                        sn: splitName[2].replace('"', '').replace('"', '').trim()
+                    });
+
+
+                }
+
+                return onu
+            }
+
+            const scanName = async () => {
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.3.1.2${id.pon}`);
+                const onuName = stdout.split('\n').filter(Boolean);
+
+                let onu = [];
+
+                for (let i = 0; i < onuName.length; i++) {
+                    const splitName = onuName[i].replace('SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.3.1.2.', '').replace('=', '').replace('STRING:', '').trim().trim().replace(' ', '::').trim().replace('  ', '').trim().split('::').filter(Boolean);
+                    const splitInterface = splitName[0].split('.').filter(Boolean);
+
+                    onu.push({
+                        pon: parseInt(splitInterface[0]),
+                        index: parseInt(splitInterface[1]),
+                        name: splitName[1].replace('\"', '').replace('\"', '').trim()
+                    });
+
+                }
+                return onu;
+            };
+
+            const scanDesc = async () => {
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.3.1.3${id.pon}`);
+                const onuName = stdout.split('\n').filter(Boolean);
+
+                let onu = [];
+
+                for (let i = 0; i < onuName.length; i++) {
+                    const splitName = onuName[i].replace('SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.3.1.3.', '').trim().replace('=', ' ').trim().replace('STRING: ', '_').trim().split('_').filter(Boolean);
+                    const splitInterfaces = splitName[0].replace(' ', '').trim().split('.').filter(Boolean);
+
+                    onu.push({
+                        pon: parseInt(splitInterfaces[0]),
+                        index: parseInt(splitInterfaces[1]),
+                        description: splitName[1].replace('\"', '').replace('\"', '').trim()
+                    });
+                }
+
+                return onu;
+            }
+
+            const scanPhaseState = async () => {
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.8.1.4${id.pon}`);
+                const onuName = stdout.split('\n').filter(Boolean);
+
+                let onu = [];
+
+                for (let i = 0; i < onuName.length; i++) {
+                    const splitName = onuName[i].split('INTEGER:'); //array 0=id 2=name
+                    const splitInterfaces = splitName[0].split('=')[0]; //
+                    const replaceInterfaces = splitInterfaces.replace('SNMPv2-SMI::enterprises.3902.1082.500.10.2.3.8.1.4.', '').trim();
+                    const arrayInterfaces = replaceInterfaces.split('.').filter(Boolean); //array 0=interfaces 1=Index Of onu
+                    const state = splitName[1].replace('\"', '').replace('\"', '').trim();
+
+                    onu.push({
+                        pon: arrayInterfaces[0],
+                        index: parseInt(arrayInterfaces[1]),
+                        state: parseInt(state),
+                    });
+
+                }
+
+                return onu;
+            };
+
+            const [sn, name, desc, phaseState] = await Promise.all([scanSN(), scanName(), scanDesc(), scanPhaseState()]);
+
+            return sn.map((item, index) => {
+                return {
+                    ...item,
+                    name: name[index].name,
+                    description: desc[index].description,
+                    state: phaseState[index].state,
+                }
+            });
+
+        }
+        catch (error) {
+            const timeout = error.message.includes('Timeout');
+            if (timeout == true) {
+                throw new Error('No Response from community');
+            }
+            else {
+                throw new Error('SNMP Error');
+            }
+        }
+    };//cek onu
+
     async scanOnu(id) {
         try {
 
@@ -555,7 +676,7 @@ export default class libSnmp {
                 throw new Error('No Response from community');
             }
             else {
-                throw new Error('SNMP Error');
+                throw new Error(error.message);
             }
         }
     }
@@ -1753,5 +1874,50 @@ export default class libSnmp {
             }
         }
     };//Check ONU LOS
+
+    async unconfiguredOnu(id){
+        try {
+
+            const zxAnGponSrvUnConfOnuSn = async () => {
+                const { stdout, stderr } = await exec(`snmpwalk -v2c -c ${id.snmp} udp:${id.ip}:${id.snmp_port} SNMPv2-SMI::enterprises.3902.1082.500.10.2.2.5.1.2`);
+                
+                const onuName = stdout.split('\n').filter(Boolean);
+
+                let onu = [];
+
+                for (let i = 0; i < onuName.length; i++) {
+                    const splitName = onuName[i].replace('SNMPv2-SMI::enterprises.3902.1082.500.10.2.2.5.1.2.', '').replace('=', '').replace('Hex-STRING:', '').trim().replace('"1,', '').replace(' ', '.').replace(/\s/g, '').trim().split('.').filter(Boolean);
+                  
+                    const vendorid = splitName[2].substring(0, 8);
+                    const parseSn = splitName[2].substring(8, splitName[2].length);
+                   
+                    const SN = hex(vendorid) + parseSn;
+
+                    onu.push({
+                        pon: parseInt(splitName[0]),
+                        index: parseInt(splitName[1]),
+                        sn: SN,
+                    });
+                    
+                }
+                return onu;
+                
+
+                
+            };
+
+            return zxAnGponSrvUnConfOnuSn();
+
+        }
+        catch (error) {
+            const timeout = error.message.includes('Timeout');
+            if (timeout == true) {
+                throw new Error('No Response from community');
+            }
+            else {
+                throw new Error('SNMP Error');
+            }
+        }
+    };//The GPON SRV UNCONF ONU SN.
 
 };

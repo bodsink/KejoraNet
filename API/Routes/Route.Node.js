@@ -7,11 +7,28 @@ moment.locale('id');
 export const NodeRoute = (app, client) => {
     app.post('/node', async (req, res, next) => {
         try {
-            const { nama, alamat, cid, status, shortname, tikor } = req.body;
+            const { nama, alamat, cid, shortname, tikor } = req.body;
 
-            if (!nama || !alamat || !cid) {
-                throw createError(400, 'Invalid input');
+            if(!nama){
+                throw createError(400, 'Nama node tidak boleh kosong');
             }
+
+            if(!alamat){
+                throw createError(400, 'Alamat node tidak boleh kosong');
+            }
+
+            if(!cid){
+                throw createError(400, 'CID node tidak boleh kosong');
+            }
+
+            if(!shortname){
+                throw createError(400, 'Shortname node tidak boleh kosong');
+            }   
+
+            if(!tikor){
+                throw createError(400, 'Tikor node tidak boleh kosong');
+            }
+
 
             const node = await client.db(process.env.MONGO_DB).collection('Node').findOne({ nama });
 
@@ -33,14 +50,12 @@ export const NodeRoute = (app, client) => {
 
             const result = await client.db(process.env.MONGO_DB).collection('Node').insertOne(data);
 
-            if (result.insertedCount === 0) {
-                throw createError(500, 'Failed to create node');
-            }
+            
 
             return res.status(201).send({
                 success: true,
-                message: 'Node created successfully',
-                data: result
+                message: 'Node berhasil ditambahkan',
+                data: data
             });
         }
         catch (error) {
@@ -82,8 +97,11 @@ export const NodeRoute = (app, client) => {
                 }
             ]).toArray();
 
-            if (node.length === 0) {
-                throw createError(404, 'Node not found');
+            if(node.length === 0){
+                return res.status(200).send({
+                    message: 'Node tidak dtemukan, silahkan tambahkan node terlebih dahulu',
+                    data: []
+                });
             }
 
             const totalOdp = await client.db(process.env.MONGO_DB).collection('ODP').aggregate([
@@ -107,12 +125,10 @@ export const NodeRoute = (app, client) => {
             const totalLayanan = await client.db(process.env.MONGO_DB).collection('Layanan').countDocuments({ user: req.user });
 
             return res.status(200).send({
-                success: true,
-                message: 'Node fetched successfully',
-                pelanggan: totalPelanggan,
+                pelanggan: totalPelanggan > 0 ? totalPelanggan : [],
                 homepass: totalOdp.length > 0 ? totalOdp : [],
-                odc: totalODC,
-                layanan: totalLayanan,
+                odc: totalODC > 0 ? totalODC : [],
+                layanan: totalLayanan > 0 ? totalLayanan : [],
                 data: node.length > 0 ? node : []
             });
         }

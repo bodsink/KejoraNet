@@ -16,11 +16,11 @@ export const OltRoute = (app, client) => {
             let dataOlt = [];
 
             for (let i = 0; i < olt.length; i++) {
-                const sys = await client.db(process.env.MONGO_DB).collection('Devices.Sys').findOne({ user: req.user, device: olt[i].uid });
+                const sys = await client.db(process.env.MONGO_DB).collection('IfSys').findOne({ user: req.user, device: olt[i].uid });
 
                 const node = await client.db(process.env.MONGO_DB).collection('Node').findOne({ user: req.user, uid: olt[i].node });
-                const pon = await client.db(process.env.MONGO_DB).collection('Devices.IfIndex').countDocuments({ user: req.user, device: olt[i].uid, iftype: 'gpon(250)' });
-                const onu = await client.db(process.env.MONGO_DB).collection('OLT.Onu').countDocuments({ user: req.user, olt: olt[i].uid });
+                const pon = await client.db(process.env.MONGO_DB).collection('IfIndex').countDocuments({ user: req.user, device: olt[i].uid, iftype: 'gpon(250)' });
+                const onu = await client.db(process.env.MONGO_DB).collection('Onu').countDocuments({ user: req.user, olt: olt[i].uid });
                
                 dataOlt.push({
                     _id: olt[i]._id,
@@ -39,12 +39,10 @@ export const OltRoute = (app, client) => {
               
             }
            
-
             return res.status(200).send({
                 count: olt.length,
                 data: dataOlt
             });
-
 
         }
         catch (err) {
@@ -81,8 +79,8 @@ export const OltRoute = (app, client) => {
                     updated_at: moment().format('LLLL')
                 }
 
-                const update = await client.db(process.env.MONGO_DB).collection('Devices.Sys').updateOne({ user: req.user, device: olt.uid }, { $set: dataUpdate });
-                console.log(update)
+                const update = await client.db(process.env.MONGO_DB).collection('IfSys').updateOne({ user: req.user, device: olt.uid }, { $set: dataUpdate });
+               
                 // console.log(`Update Sys ${olt.uid} ${dataUpdate.sysUpTimeInstance}`);
             };
 
@@ -93,30 +91,48 @@ export const OltRoute = (app, client) => {
 
             const node = await client.db(process.env.MONGO_DB).collection('Node').findOne({ user: req.user, uid: olt.node });
 
-            const sys = await client.db(process.env.MONGO_DB).collection('Devices.Sys').findOne({ user: req.user, device: olt.uid });
+            const sys = await client.db(process.env.MONGO_DB).collection('IfSys').findOne({ user: req.user, device: olt.uid });
             
-            const countOnu = await client.db(process.env.MONGO_DB).collection('OLT.Onu').countDocuments({ user: req.user, olt: olt.uid});
+            const countOnu = await client.db(process.env.MONGO_DB).collection('Onu').countDocuments({ user: req.user, olt: olt.uid});
             
-            const onuOnline = await client.db(process.env.MONGO_DB).collection('OLT.Onu').countDocuments({ user: req.user, olt: olt.uid, state: 4 });
+            const onuOnline = await client.db(process.env.MONGO_DB).collection('Onu').countDocuments({ user: req.user, olt: olt.uid, state: 4 });
 
-            const onuLos = await client.db(process.env.MONGO_DB).collection('OLT.Onu').countDocuments({ user: req.user, olt: olt.uid, state: 2 });
+            const onuLos = await client.db(process.env.MONGO_DB).collection('Onu').countDocuments({ user: req.user, olt: olt.uid, state: 2 });
 
-            const onuPowerOff = await client.db(process.env.MONGO_DB).collection('OLT.Onu').countDocuments({ user: req.user, olt: olt.uid, state: 5 });
+            const onuPowerOff = await client.db(process.env.MONGO_DB).collection('Onu').countDocuments({ user: req.user, olt: olt.uid, state: 5 });
 
-            const onuOffline = await client.db(process.env.MONGO_DB).collection('OLT.Onu').countDocuments({ user: req.user, olt: olt.uid, state: 7 });
+            const onuOffline = await client.db(process.env.MONGO_DB).collection('Onu').countDocuments({ user: req.user, olt: olt.uid, state: 7 });
 
-            const onu = await client.db(process.env.MONGO_DB).collection('OLT.Onu').find({ user: req.user, olt: req.params.id }).toArray();
-            const vlan = await client.db(process.env.MONGO_DB).collection('Devices.IfVlan').find({ user: req.user, device: olt.uid}).sort({id: 1}).toArray();
+            const onu = await client.db(process.env.MONGO_DB).collection('Onu').find({ user: req.user, olt: req.params.id }).toArray();
+            const vlan = await client.db(process.env.MONGO_DB).collection('IfVlan').find({ user: req.user, device: olt.uid}).sort({id: 1}).toArray();
+
+            const uplink = await client.db(process.env.MONGO_DB).collection('IfIndex').aggregate([
+                {
+                    $match: {
+                        user: req.user,
+                        device: olt.uid,
+                        iftype: 'ethernetCsmacd(6)',
+                        ifname: {$not :{$regex: 'Mng1'}}
+                    
+                    }
+                },{
+                    $lookup: {
+                        from: 'IfOptical',
+                        localField: 'ifindex',
+                        foreignField: 'ifindex',
+                        as: 'optical'
+                    }
+                },{
+                    $unwind: {
+                        path: '$optical',
+                        preserveNullAndEmptyArrays: true
+                    }
+                }
+            ]).sort({ifindex: 1}).toArray();
+
+
+            const cards = await client.db(process.env.MONGO_DB).collection('OLT.Cards').find({ user: req.user, device: olt.uid}).sort({slot: 1}).toArray();
            
-            const uplink = await client.db(process.env.MONGO_DB).collection('Devices.IfIndex').find({
-                 user: req.user, 
-                 device: olt.uid,
-                  iftype: 'ethernetCsmacd(6)',
-                  ifname: {$not :{$regex: 'Mng1'}}
-                 }).sort({ifindex: 1}).toArray();
-
-
-            const cards = await client.db(process.env.MONGO_DB).collection('OLT.Cards').find({ user: req.user, olt: olt.uid}).sort({slot: 1}).toArray();
 
             const removeNumberString = (str) => {
                 return str.replace(/[0-9]/g, '');
@@ -133,7 +149,7 @@ export const OltRoute = (app, client) => {
 
             const totalLowSignal = a.filter((item) => item.signal < -25).length;
 
-            const pon = await client.db(process.env.MONGO_DB).collection('Devices.IfIndex').aggregate([
+            const pon = await client.db(process.env.MONGO_DB).collection('IfIndex').aggregate([
                 {
                     $match: {
                         user: req.user,
@@ -143,11 +159,24 @@ export const OltRoute = (app, client) => {
                 },
                 {
                     $lookup: {
-                        from: 'OLT.Onu',
+                        from: 'Onu',
                         localField: 'ifindex',
                         foreignField: 'pon',
                         as: 'onu'
                     }
+                },{
+                    $lookup: {
+                        from: 'IfOptical',
+                        localField: 'ifindex',
+                        foreignField: 'ifindex',    
+                        as: 'optical'
+                    }
+                },
+                {
+                   $unwind: {
+                          path: '$optical',
+                          preserveNullAndEmptyArrays: true
+                   }
                 },
                 {
                     $project:{
@@ -222,7 +251,7 @@ export const OltRoute = (app, client) => {
             }
 
            
-            const onu = await client.db(process.env.MONGO_DB).collection('OLT.Onu').find({
+            const onu = await client.db(process.env.MONGO_DB).collection('Onu').find({
                 user: req.user,
                 olt: req.params.id,
                

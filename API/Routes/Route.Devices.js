@@ -3,6 +3,9 @@ import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment-timezone';
 moment.locale('id');
 
+import libSnmp from '../Lib/Snmp.js';
+const snmp = new libSnmp();
+
 
 export const DevicesRoute = (app, client) => {
     app.post('/devices', async (req, res, next) => {
@@ -78,6 +81,8 @@ export const DevicesRoute = (app, client) => {
             if (!save) {
                 throw createError(500, 'Internal server error');
             }
+
+
 
             res.status(201).json({
                 status: 200,

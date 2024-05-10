@@ -627,10 +627,8 @@ export const VendorRoute = (app, client) => {
                 }
             ]).sort({ created_at: -1 }).toArray();
 
-
-            if (vendor.length === 0) {
-                throw createError(404, 'Vendor not found');
-            }
+           
+         
 
             return res.status(200).send({
                 message: 'Vendor found',

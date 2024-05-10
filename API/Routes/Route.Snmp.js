@@ -234,7 +234,7 @@ export const snmpRoute = (app, client) => {
                         user: req.user,
                         device: olt,
                         iftype: 'gpon(250)',
-                        ifoperstatus: 'up(1)'
+                       // ifoperstatus: 'up(1)'
                     }
                 }, {
                     $lookup: {

@@ -681,7 +681,7 @@ export const snmpRoute = (app, client) => {
 
                     if (update && update.modifiedCount > 0) {
                         console.log(`Vlan ${vlan[i].id} ${vlan[i].name} updated`)
-                        vlans.push(dataUpdate)
+                       // vlans.push(dataUpdate)
                     } else {
                         console.log(`Vlan ${vlan[i].id} ${vlan[i].name} not updated`)
                     }
@@ -701,7 +701,7 @@ export const snmpRoute = (app, client) => {
 
                     if (result) {
                         console.log(`Vlan ${vlan[i].id} ${vlan[i].name} telah di simpan`)
-                        vlans.push(dataSave)
+                       // vlans.push(dataSave)
                     } else {
                         console.log(`Vlan ${vlan[i].id} ${vlan[i].name} gagal di simpan`)
                     }

@@ -113,10 +113,6 @@ export const PelangganRoute = (app, client) => {
 
                 const file = req.file;
 
-
-
-
-
                 const workbook = XLSX.readFile('./uploads/' + file.filename);
                 const sheet_name_list = workbook.SheetNames;
                 const xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
@@ -127,10 +123,12 @@ export const PelangganRoute = (app, client) => {
                         uid: uuidv4(),
                         id: '13' + Math.floor(Math.random() * 1000) + 1,
                         other: item.OtherDetail,
+                        nik: item.IdentityNumber,
                         label: item.group,
                         nama: item.DisplayName,
                         alamat: item.BillingAddress,
                         phone: item.Mobile,
+                        email: item.email,
                         pekerjaan: null,
                         sex: null,
                         status: 'active',

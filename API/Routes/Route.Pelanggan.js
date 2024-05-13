@@ -127,7 +127,7 @@ export const PelangganRoute = (app, client) => {
 
             const ImportData = async (file) => {
                 return new Promise((resolve, reject) => {
-                    const workbook = XLSX.readFile('./uploads/' + file.filename);
+                    const workbook = XLSX.readFile('./Uploads/' + file.filename);
                     const sheet_name_list = workbook.SheetNames;
                     const xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
                     const data = xlData.map((item) => {

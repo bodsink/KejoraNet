@@ -5,6 +5,7 @@ import { nextTick } from 'process';
 import { create } from 'domain';
 import XLSX from 'xlsx';
 import multer from 'multer';
+import { resolve } from 'path';
 moment.locale('id');
 
 export const PelangganRoute = (app, client) => {
@@ -89,71 +90,172 @@ export const PelangganRoute = (app, client) => {
         }
     });
 
+    // app.post('/pelanggan/import', async (req, res, next) => { // Import data from excel
+    //     try {
+
+    //         const storage = multer.diskStorage({
+    //             destination: function (req, file, cb) {
+    //                 cb(null, './Uploads')
+    //             },
+    //             filename: function (req, file, cb) {
+    //                 cb(null, file.originalname)
+    //             }
+    //         });
+
+    //         const upload = multer({ storage: storage }).single('file');
+
+    //         upload(req, res, async function (err) {
+
+    //             if (err instanceof multer.MulterError) {
+    //                 return next(createError(400, err.message));
+    //             } else if (err) {
+    //                 return next(createError(400, err.message));
+    //             }
+
+    //             const file = req.file;
+
+    //             const workbook = XLSX.readFile('./uploads/' + file.filename);
+    //             const sheet_name_list = workbook.SheetNames;
+    //             const xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+    //             const data = xlData.map((item) => {
+
+    //                 return {
+    //                     user: req.user,
+    //                     uid: uuidv4(),
+    //                     id: '13' + Math.floor(Math.random() * 1000) + 1,
+    //                     other: item.OtherDetail,
+    //                     nik: item.IdentityNumber,
+    //                     label: item.group,
+    //                     nama: item.DisplayName,
+    //                     alamat: item.BillingAddress,
+    //                     phone: item.Mobile,
+    //                     email: item.email,
+    //                     pekerjaan: null,
+    //                     sex: null,
+    //                     status: 'active',
+    //                     created_at: moment().unix(),
+    //                     updated_at: moment().unix()
+    //                 }
+
+
+    //             });
+
+    //             const pelanggan = await client.db(process.env.MONGO_DB).collection('Pelanggan').insertMany(data);
+
+    //             if (!pelanggan) {
+    //                 throw createError(400, 'Failed to save data');  // Error handling
+    //             }
+
+    //             res.status(200).send({
+    //                 count: pelanggan.insertedCount,
+    //                 data: data
+    //             })
+
+
+    //         }
+
+    //         );
+
+    //     }
+    //     catch (error) {
+    //         console.log(error.message)
+    //         return next(
+    //             createError(error.status, error.message));
+    //     }
+    // });
+
+
+
     app.post('/pelanggan/import', async (req, res, next) => { // Import data from excel
         try {
 
-            const storage = multer.diskStorage({
-                destination: function (req, file, cb) {
-                    cb(null, './Uploads')
-                },
-                filename: function (req, file, cb) {
-                    cb(null, file.originalname)
-                }
-            });
+            const UploadFileExcel = async () => {
+                return new Promise((resolve, reject) => {
 
-            const upload = multer({ storage: storage }).single('file');
+                    const storage = multer.diskStorage({
+                        destination: function (req, file, cb) {
+                            cb(null, './Uploads')
+                        },
+                        filename: function (req, file, cb) {
+                            cb(null, file.originalname)
+                        }
+                    });
 
-            upload(req, res, async function (err) {
+                    const upload = multer({ storage: storage }).single('file');
 
-                if (err instanceof multer.MulterError) {
-                    return next(createError(400, err.message));
-                } else if (err) {
-                    return next(createError(400, err.message));
-                }
+                    upload(req, res, async function (err) {
 
-                const file = req.file;
+                        if (err instanceof multer.MulterError) {
+                            return reject(err);
+                        } else if (err) {
+                            return reject(err);
+                        }
 
-                const workbook = XLSX.readFile('./uploads/' + file.filename);
-                const sheet_name_list = workbook.SheetNames;
-                const xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-                const data = xlData.map((item) => {
+                        return resolve(req.file);
 
-                    return {
-                        user: req.user,
-                        uid: uuidv4(),
-                        id: '13' + Math.floor(Math.random() * 1000) + 1,
-                        other: item.OtherDetail,
-                        nik: item.IdentityNumber,
-                        label: item.group,
-                        nama: item.DisplayName,
-                        alamat: item.BillingAddress,
-                        phone: item.Mobile,
-                        email: item.email,
-                        pekerjaan: null,
-                        sex: null,
-                        status: 'active',
-                        created_at: moment().unix(),
-                        updated_at: moment().unix()
-                    }
 
+                    });
 
                 });
 
-                const pelanggan = await client.db(process.env.MONGO_DB).collection('Pelanggan').insertMany(data);
+            };
 
-                if (!pelanggan) {
-                    throw createError(400, 'Failed to save data');  // Error handling
-                }
 
-                res.status(200).send({
-                    message: 'Data saved successfully',
-                    data: pelanggan
-                })
+            const ImportData = async (file) => {
+                return new Promise((resolve, reject) => {
+                    const workbook = XLSX.readFile('./uploads/' + file.filename);
+                    const sheet_name_list = workbook.SheetNames;
+                    const xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+                    const data = xlData.map((item) => {
+                        return {
+                            user: req.user,
+                            uid: uuidv4(),
+                            id: '13' + Math.floor(Math.random() * 1000) + 1,
+                            other: item.OtherDetail,
+                            nik: item.IdentityNumber,
+                            label: item.group,
+                            nama: item.DisplayName,
+                            alamat: item.BillingAddress,
+                            phone: item.Mobile,
+                            email: item.email,
+                            pekerjaan: null,
+                        }
+                    });
 
+
+                    return resolve(data);
+
+                });
 
             }
 
-            );
+            const data = await ImportData(await UploadFileExcel());
+
+
+            let array = [];
+
+            for (let i = 0; i < data.length; i++) {
+                const duplicate = await client.db(process.env.MONGO_DB).collection('Pelanggan').findOne({ user: req.user, phone: data[i].phone });
+                
+                if(duplicate){
+                    return next(createError(400, 'Nomor Ponsel teleh terdaftar'));
+                } else {
+                   const save = await client.db(process.env.MONGO_DB).collection('Pelanggan').insertOne(data[i]);
+                     array.push(data);
+                }
+            }
+
+            return res.status(201).send({
+                Jumlah_Import: array.length,
+            })
+
+
+
+
+
+
+
+
 
         }
         catch (error) {
@@ -214,22 +316,22 @@ export const PelangganRoute = (app, client) => {
                         path: '$layanan',
                         preserveNullAndEmptyArrays: true
                     }
-                },{
+                }, {
                     $lookup: {
                         from: 'Produk',
                         localField: 'layanan.produk',
                         foreignField: 'uid',
                         as: 'layanan.produk'
                     }
-                },{
-                    $lookup:{
+                }, {
+                    $lookup: {
                         from: 'ODP',
                         localField: 'layanan.odp',
                         foreignField: 'uid',
                         as: 'layanan.odp'
-                    
+
                     }
-                },{
+                }, {
                     $project: {
                         _id: 0,
                         user: 0,
@@ -269,7 +371,7 @@ export const PelangganRoute = (app, client) => {
             const page1 = req.query.page || 1;
             const offset = (page1 - 1) * limit;
             const pelanggan = await client.db(process.env.MONGO_DB).collection('Pelanggan').find({ user: req.user }).sort({ nama: 1 }).skip(offset).limit(limit).toArray();
-            
+
             if (!pelanggan) {
                 throw createError(400, 'Data not found');
             }
@@ -307,7 +409,7 @@ export const PelangganRoute = (app, client) => {
             }
         }
         catch (error) {
-           console.log(error)
+            console.log(error)
             return next(
                 createError(error.status, error.message));
         }
